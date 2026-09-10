@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductImage from '../components/ProductImage.astro';
+import WaveDivider from '../components/WaveDivider.astro';
+import { getProducts } from '../lib/repo/catalog';
+
+export const prerender = false;
+
+const brandName = Astro.locals.brand.name;
+const products = await getProducts({ sort: 'destaque', limit: 2 });
+const { data: page } = Astro.locals.site.page_sobre;
+const titleLines = page.hero_title.split('\n');
+const metaDescription = page.paragraphs[0]?.slice(0, 155) || `Conheça a ${brandName}.`;
+---
+
+<BaseLayout title={`Sobre a ${brandName}`} description={metaDescription}>
+  <section class="container-x grid gap-10 py-14 md:grid-cols-2 md:items-center md:gap-16 md:py-20">
+    <div>
+      {page.hero_eyebrow && <p class="eyebrow">{page.hero_eyebrow}</p>}
+      <h1 class="mt-5 font-display text-4xl leading-tight sm:text-5xl">
+        {titleLines.map((line, i) => (
+          <>{i > 0 && <br />}{line}</>
+        ))}
+      </h1>
+      <div class="prose-iarah mt-6">
+        {page.paragraphs.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+    <div class="grid gap-4">
+      {products.map((p) => (
+        <div class="overflow-hidden rounded-card bg-bone-200">
+          <ProductImage src={p.images[0] ?? ''} alt={p.name} ratio="3 / 2" widths={[400, 600, 800]} />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {page.values.length > 0 && (
+    <>
+      <WaveDivider class="text-agua-wash" color="#E3ECE9" />
+      <section class="bg-agua-wash py-16 md:py-20">
+        <div class="container-x grid gap-8 md:grid-cols-3">
+          {page.values.map((v) => (
+            <div>
+              <h2 class="font-display text-xl">{v.title}</h2>
+              <p class="mt-2 font-sans text-[14px] leading-relaxed text-ink-soft">{v.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  )}
+
+  {(page.cta_title || page.cta_label) && (
+    <section class="container-x py-16 text-center md:py-20">
+      {page.cta_title && <h2 class="font-display text-3xl">{page.cta_title}</h2>}
+      {page.cta_body && <p class="prose-iarah mx-auto mt-3">{page.cta_body}</p>}
+      {page.cta_label && <a href={page.cta_href || '/loja'} class="btn-primary mt-6">{page.cta_label}</a>}
+    </section>
+  )}
+</BaseLayout>

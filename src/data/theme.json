@@ -1,0 +1,16 @@
+{
+  "_comment": "Brasa & Folha. Visual street/HQ: papel cru quente, tinta roxa profunda, pop verde-limão ácido, secundário roxo vivo. Display Bricolage Grotesque com contorno+sombra de quadrinho; Bungee nos rótulos; Space Grotesk no texto. Chaves semânticas por posição: bone = fundo, ink = texto, agua = acento (limão), blush = acento secundário (roxo). Trocar os valores aqui re-skina a loja toda.",
+  "colors": {
+    "bone": { "DEFAULT": "#F6F0E3", "50": "#FCFAF3", "100": "#F6F0E3", "200": "#ECE2CE", "300": "#E0D2B4" },
+    "ink": { "DEFAULT": "#231246", "soft": "#443368", "muted": "#7A6C97" },
+    "agua": { "DEFAULT": "#8CDA16", "light": "#AEE94F", "dark": "#5F9A0B", "wash": "#E9E0F8" },
+    "blush": { "DEFAULT": "#6C2BD9", "light": "#E7DBFA" }
+  },
+  "fonts": {
+    "display": ["Bricolage Grotesque Variable", "Bricolage Grotesque", "system-ui", "sans-serif"],
+    "sans": ["Space Grotesk Variable", "Space Grotesk", "system-ui", "sans-serif"],
+    "accent": ["Bungee", "Bricolage Grotesque Variable", "system-ui", "sans-serif"]
+  },
+  "radius": "14px",
+  "themeColor": "#231246"
+}

@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FavoritesGrid from '../components/FavoritesGrid.tsx';
+import type { FavCard } from '../components/FavoritesGrid.tsx';
+import { getProducts } from '../lib/repo/catalog';
+
+export const prerender = false;
+
+const products = await getProducts({});
+const cards: FavCard[] = products.map((p) => ({
+  id: p.id,
+  slug: p.slug,
+  name: p.name,
+  category: p.category_name,
+  priceCents: p.price_cents,
+  compareAtCents: p.compare_at_price_cents,
+  image: p.images[0] ?? '',
+  stock: p.stock,
+}));
+---
+
+<BaseLayout title="Favoritos" description="Os produtos que você salvou." noindex>
+  <section class="container-x py-12 md:py-16">
+    <p class="eyebrow">Sua lista</p>
+    <h1 class="mt-3 font-display text-3xl sm:text-4xl">Favoritos</h1>
+    <p class="mt-2 font-sans text-[13px] text-ink-muted">
+      Salvos neste navegador — some se você limpar os dados do site.
+    </p>
+
+    <div class="mt-10">
+      <FavoritesGrid client:only="preact" products={cards} />
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CheckoutFlow from '../../components/CheckoutFlow.tsx';
+import { getProfile, listAddresses } from '../../lib/repo/account';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+const sb = Astro.locals.supabase;
+
+let profile = null;
+let addresses: Awaited<ReturnType<typeof listAddresses>> = [];
+if (user && sb) {
+  [profile, addresses] = await Promise.all([getProfile(sb, user.id), listAddresses(sb)]);
+}
+---
+
+<BaseLayout title="Checkout" description="Finalize sua compra com segurança." noindex>
+  <section class="container-x py-10 md:py-14">
+    <a href="/loja" class="font-sans text-[12px] uppercase tracking-[0.14em] text-ink-muted hover:text-ink">
+      ← Continuar comprando
+    </a>
+    <h1 class="mt-4 font-display text-3xl sm:text-4xl">Finalizar compra</h1>
+    <p class="mt-2 font-sans text-[14px] text-ink-muted">
+      Pagamento processado pelo Mercado Pago. Seus dados trafegam criptografados.
+    </p>
+
+    <div class="mt-10">
+      <CheckoutFlow
+        client:only="preact"
+        isLoggedIn={Boolean(user)}
+        userEmail={user?.email ?? ''}
+        initialProfile={profile}
+        savedAddresses={addresses}
+      />
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WaveDivider from '../../components/WaveDivider.astro';
+import { getOrderByNumber } from '../../lib/repo/orders';
+import { brl } from '../../lib/format';
+import { hasSupabasePublic } from '../../lib/env';
+
+export const prerender = false;
+
+const orderNumber = Astro.url.searchParams.get('n') || '';
+const order = orderNumber ? await getOrderByNumber(orderNumber) : null;
+
+const showAccountCta =
+  hasSupabasePublic && !Astro.locals.user && order && !order.user_id;
+const signupHref = order
+  ? `/cadastrar?email=${encodeURIComponent(order.customer_email)}&next=/conta/pedidos`
+  : '/cadastrar';
+---
+
+<BaseLayout title="Pedido confirmado" description="Recebemos o seu pedido." noindex>
+  <section class="container-x py-16 md:py-24">
+    {!order ? (
+      <div class="mx-auto max-w-lg text-center">
+        <h1 class="font-display text-3xl">Pedido não encontrado</h1>
+        <p class="prose-iarah mx-auto mt-4">
+          Não localizamos esse pedido. Se você acabou de pagar, aguarde alguns instantes e
+          verifique seu e-mail.
+        </p>
+        <a href="/loja" class="btn-primary mt-6">Voltar à loja</a>
+      </div>
+    ) : (
+      <div class="mx-auto max-w-2xl">
+        <div class="text-center">
+          <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-agua text-white">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <p class="eyebrow mt-6">Pedido {order.order_number}</p>
+          <h1 class="mt-3 font-display text-4xl">
+            {order.status === 'paid' ? 'Pagamento confirmado' : 'Recebemos o seu pedido'}
+          </h1>
+          <p class="prose-iarah mx-auto mt-4">
+            {order.status === 'paid'
+              ? `Enviamos a confirmação para ${order.customer_email}. Seu pedido já entrou em separação — o código de rastreio chega assim que for postado.`
+              : `Estamos aguardando a confirmação do pagamento. Você recebe um e-mail em ${order.customer_email} assim que tudo estiver certo.`}
+          </p>
+        </div>
+
+        <div class="mt-10 rounded-card border border-ink/10 bg-white/50 p-6">
+          <h2 class="font-display text-lg">Itens</h2>
+          <ul class="mt-4 divide-y divide-ink/10">
+            {order.items.map((item) => (
+              <li class="flex items-center justify-between py-3 text-[14px]">
+                <span class="text-ink">{item.product_name} <span class="text-ink-muted">× {item.quantity}</span></span>
+                <span class="text-ink">{brl(item.unit_price_cents * item.quantity)}</span>
+              </li>
+            ))}
+          </ul>
+          <dl class="mt-4 space-y-1.5 border-t border-ink/10 pt-4 text-[14px]">
+            <div class="flex justify-between text-ink-soft"><dt>Subtotal</dt><dd>{brl(order.subtotal_cents)}</dd></div>
+            <div class="flex justify-between text-ink-soft"><dt>Frete</dt><dd>{order.shipping_cents === 0 ? 'Grátis' : brl(order.shipping_cents)}</dd></div>
+            <div class="flex justify-between border-t border-ink/10 pt-2 font-display text-lg text-ink"><dt>Total</dt><dd>{brl(order.total_cents)}</dd></div>
+          </dl>
+        </div>
+
+        <div class="mt-6 rounded-card border border-ink/10 bg-white/50 p-6 text-[14px] text-ink-soft">
+          <h2 class="font-display text-lg text-ink">Entrega</h2>
+          <p class="mt-2">
+            {order.shipping_address.street}, {order.shipping_address.number}
+            {order.shipping_address.complement ? ` — ${order.shipping_address.complement}` : ''}<br />
+            {order.shipping_address.district} — {order.shipping_address.city}/{order.shipping_address.state}<br />
+            CEP {order.shipping_address.cep}
+          </p>
+        </div>
+
+        {showAccountCta && (
+          <div class="mt-8 rounded-card border border-agua/40 bg-agua-wash px-5 py-4 text-center">
+            <p class="font-sans text-[14px] text-ink-soft">
+              Crie uma conta com <strong>{order.customer_email}</strong> para acompanhar este
+              pedido e agilizar as próximas compras.
+            </p>
+            <a href={signupHref} class="btn-outline mt-3">Criar conta</a>
+          </div>
+        )}
+
+        <div class="mt-10 text-center">
+          <a href={Astro.locals.user ? '/conta/pedidos' : '/loja'} class="btn-primary">
+            {Astro.locals.user ? 'Ver meus pedidos' : 'Continuar comprando'}
+          </a>
+        </div>
+      </div>
+    )}
+  </section>
+  <WaveDivider class="text-agua-wash" color="#E3ECE9" />
+</BaseLayout>

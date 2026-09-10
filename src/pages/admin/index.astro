@@ -1,0 +1,83 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getProducts } from '../../lib/repo/catalog';
+import { listOrders } from '../../lib/repo/orders';
+import { brl } from '../../lib/format';
+import { ORDER_STATUS_LABELS } from '../../lib/types';
+
+export const prerender = false;
+
+const [products, orders] = await Promise.all([
+  getProducts({ includeInactive: true }),
+  listOrders(500),
+]);
+
+const paid = orders.filter((o) => o.status === 'paid');
+const revenue = paid.reduce((sum, o) => sum + o.total_cents, 0);
+const pending = orders.filter((o) => o.status === 'pending').length;
+const lowStock = products.filter((p) => p.is_active && p.stock <= 5);
+
+const stats = [
+  { label: 'Produtos ativos', value: String(products.filter((p) => p.is_active).length) },
+  { label: 'Pedidos pagos', value: String(paid.length) },
+  { label: 'Receita confirmada', value: brl(revenue) },
+  { label: 'Pedidos pendentes', value: String(pending) },
+];
+
+const recent = orders.slice(0, 8);
+---
+
+<AdminLayout title="Painel">
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {stats.map((s) => (
+      <div class="rounded-card border border-ink/10 bg-white p-5">
+        <p class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted">{s.label}</p>
+        <p class="mt-2 font-display text-2xl text-ink">{s.value}</p>
+      </div>
+    ))}
+  </div>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+    <section class="rounded-card border border-ink/10 bg-white p-5">
+      <div class="flex items-center justify-between">
+        <h2 class="font-display text-lg">Pedidos recentes</h2>
+        <a href="/admin/pedidos" class="font-sans text-[12px] uppercase tracking-[0.12em] text-agua-dark">Ver todos</a>
+      </div>
+      {recent.length === 0 ? (
+        <p class="mt-4 font-sans text-sm text-ink-muted">Nenhum pedido ainda.</p>
+      ) : (
+        <table class="mt-4 w-full text-left text-sm">
+          <thead class="text-[12px] uppercase tracking-[0.1em] text-ink-muted">
+            <tr><th class="pb-2">Pedido</th><th class="pb-2">Cliente</th><th class="pb-2">Status</th><th class="pb-2 text-right">Total</th></tr>
+          </thead>
+          <tbody>
+            {recent.map((o) => (
+              <tr class="border-t border-ink/10">
+                <td class="py-2"><a href={`/admin/pedidos/${o.order_number}`} class="text-agua-dark">{o.order_number}</a></td>
+                <td class="py-2 text-ink-soft">{o.customer_name}</td>
+                <td class="py-2"><span class="rounded-full bg-bone-200 px-2 py-0.5 text-[11px] uppercase">{ORDER_STATUS_LABELS[o.status]}</span></td>
+                <td class="py-2 text-right">{brl(o.total_cents)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
+
+    <section class="rounded-card border border-ink/10 bg-white p-5">
+      <h2 class="font-display text-lg">Estoque baixo</h2>
+      {lowStock.length === 0 ? (
+        <p class="mt-4 font-sans text-sm text-ink-muted">Tudo com folga.</p>
+      ) : (
+        <ul class="mt-4 space-y-2">
+          {lowStock.map((p) => (
+            <li class="flex items-center justify-between text-sm">
+              <a href={`/admin/produtos/${p.id}`} class="text-agua-dark">{p.name}</a>
+              <span class="font-sans text-ink-muted">{p.stock} un.</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  </div>
+</AdminLayout>

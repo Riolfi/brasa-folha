@@ -1,0 +1,26 @@
+---
+interface Props {
+  flip?: boolean;
+  class?: string;
+  color?: string;
+}
+const { flip = false, class: className = '', color = 'currentColor' } = Astro.props;
+---
+<svg
+  class:list={['wave-divider block w-full h-[40px] sm:h-[64px]', className]}
+  style={flip ? 'transform: scaleY(-1)' : undefined}
+  viewBox="0 0 1200 64"
+  preserveAspectRatio="none"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path
+    d="M0 40 C 150 10, 300 10, 450 34 S 750 62, 900 40 S 1150 12, 1200 28 L 1200 64 L 0 64 Z"
+    fill={color}
+    opacity="0.5"
+  />
+  <path
+    d="M0 48 C 200 24, 380 66, 600 44 S 1000 20, 1200 44 L 1200 64 L 0 64 Z"
+    fill={color}
+  />
+</svg>

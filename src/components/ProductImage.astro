@@ -1,0 +1,47 @@
+---
+/**
+ * Imagem de produto responsiva.
+ * - Unsplash (placeholders): gera srcset com corte/largura via query params.
+ * - Imagens enviadas (Supabase Storage / /uploads/): servidas como estão.
+ */
+interface Props {
+  src: string;
+  alt: string;
+  sizes?: string;
+  widths?: number[];
+  ratio?: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'auto';
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw',
+  widths = [320, 480, 640, 900, 1200],
+  ratio = '4 / 5',
+  loading = 'lazy',
+  fetchpriority = 'auto',
+  class: className = '',
+} = Astro.props;
+
+const isUnsplash = /unsplash\.com\//.test(src || '');
+const base = (src || '').split('?')[0];
+const build = (w: number) => `${base}?auto=format&fit=crop&q=68&w=${w}`;
+
+const imgSrc = isUnsplash ? build(widths[Math.floor(widths.length / 2)]!) : src;
+const srcset = isUnsplash ? widths.map((w) => `${build(w)} ${w}w`).join(', ') : undefined;
+---
+
+<img
+  src={imgSrc}
+  srcset={srcset}
+  sizes={srcset ? sizes : undefined}
+  alt={alt}
+  loading={loading}
+  fetchpriority={fetchpriority}
+  decoding="async"
+  style={`aspect-ratio: ${ratio}`}
+  class:list={['h-full w-full object-cover', className]}
+/>

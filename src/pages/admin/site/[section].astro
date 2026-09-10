@@ -1,0 +1,31 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import SiteSectionForm from '../../../components/SiteSectionForm.tsx';
+import { getSiteSection, isSiteSectionKey } from '../../../lib/repo/site';
+
+export const prerender = false;
+
+const { section } = Astro.params;
+if (!isSiteSectionKey(section)) return Astro.redirect('/admin/site');
+
+const entry = await getSiteSection(section);
+
+const LABELS: Record<string, string> = {
+  brand: 'Logotipo',
+  home_quiz: 'Home — CTA do teste de pele',
+  home_bestsellers: 'Home — Mais queridos',
+  home_story: 'Home — Narrativa da marca',
+  home_social: 'Home — Prova social',
+  page_sobre: 'Página "Sobre"',
+  page_contato: 'Página "Contato"',
+  footer: 'Rodapé',
+  contact: 'Atendimento',
+};
+---
+
+<AdminLayout title={LABELS[section] ?? 'Conteúdo'}>
+  <a href="/admin/site" class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted hover:text-ink">← Conteúdo</a>
+  <div class="mt-4">
+    <SiteSectionForm client:load section={section} entry={entry} />
+  </div>
+</AdminLayout>

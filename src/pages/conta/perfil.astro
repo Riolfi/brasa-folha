@@ -1,0 +1,18 @@
+---
+import AccountLayout from '../../layouts/AccountLayout.astro';
+import ProfileForm from '../../components/ProfileForm.tsx';
+import { getProfile } from '../../lib/repo/account';
+
+export const prerender = false;
+
+const user = Astro.locals.user!;
+const sb = Astro.locals.supabase!;
+const profile = await getProfile(sb, user.id);
+---
+
+<AccountLayout title="Meus dados" active="perfil">
+  <p class="prose-iarah mb-6">
+    Esses dados são usados para agilizar o checkout. E-mail da conta: <strong>{user.email}</strong>.
+  </p>
+  <ProfileForm client:load profile={profile} />
+</AccountLayout>

@@ -1,0 +1,111 @@
+---
+import { getCategoryTree } from '../lib/repo/catalog';
+import { env, hasSupabasePublic } from '../lib/env';
+import CartButton from './CartButton.tsx';
+import FavoritesLink from './FavoritesLink.tsx';
+import AccountMenu from './AccountMenu.astro';
+
+const tree = await getCategoryTree();
+const path = Astro.url.pathname;
+const showAccount = hasSupabasePublic;
+const showQuiz = env.quizEnabled;
+const logoUrl = Astro.locals.site.brand.data.logo_url;
+const brandName = Astro.locals.brand.name;
+---
+
+<header class="sticky top-0 z-50 border-b border-ink/10 bg-bone/85 backdrop-blur-md">
+  <div class="container-x flex h-16 items-center justify-between gap-6">
+    <a href="/" class="flex items-center" aria-label={`${brandName} — página inicial`}>
+      <img
+        src={logoUrl || ''}
+        alt={brandName}
+        data-role="logo-img"
+        hidden={!logoUrl}
+        class="h-7 w-auto max-h-8 max-w-[170px] object-contain"
+      />
+      <span
+        data-role="logo-text"
+        hidden={!!logoUrl}
+        class="font-display text-2xl lowercase tracking-tight text-ink"
+      >
+        {brandName}
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-8 lg:flex" aria-label="Navegação principal">
+      <div class="group relative">
+        <a
+          href="/loja"
+          class:list={['font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark', path.startsWith('/loja') && 'text-agua-dark']}
+        >
+          Loja
+        </a>
+        <div class="invisible absolute left-1/2 top-full -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
+          <div class="flex gap-6 rounded-card border border-ink/10 bg-bone p-5 shadow-lg">
+            {tree.map((root) => (
+              <div class="min-w-[9rem]">
+                <a href={`/loja?categoria=${root.slug}`} class="block font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-ink hover:text-agua-dark">
+                  {root.name}
+                </a>
+                <ul class="mt-2 space-y-1">
+                  {root.children.map((sub) => (
+                    <li>
+                      <a href={`/loja?categoria=${sub.slug}`} class="block rounded-card px-2 py-1 font-sans text-sm text-ink-soft transition-colors hover:bg-bone-200 hover:text-ink">
+                        {sub.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {showQuiz && <a href="/rotina" class:list={['font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark', path.startsWith('/rotina') && 'text-agua-dark']}>Teste de pele</a>}
+      <a href="/sobre" class:list={['font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark', path === '/sobre' && 'text-agua-dark']}>Sobre</a>
+      <a href="/contato" class:list={['font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark', path === '/contato' && 'text-agua-dark']}>Contato</a>
+    </nav>
+
+    <div class="flex items-center gap-3 sm:gap-4">
+      <FavoritesLink client:load />
+      <CartButton client:load />
+      {showAccount && <AccountMenu user={Astro.locals.user} />}
+      <button
+        type="button"
+        class="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink/20"
+        aria-label="Abrir menu"
+        data-menu-toggle
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="hidden border-t border-ink/10 bg-bone lg:!hidden" data-mobile-menu>
+    <nav class="container-x flex flex-col py-4" aria-label="Navegação mobile">
+      <a href="/loja" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Loja</a>
+      {tree.map((root) => (
+        <>
+          <a href={`/loja?categoria=${root.slug}`} class="py-2 pl-4 font-sans text-[13px] font-medium text-ink">{root.name}</a>
+          {root.children.map((sub) => (
+            <a href={`/loja?categoria=${sub.slug}`} class="py-1.5 pl-8 font-sans text-sm text-ink-soft">{sub.name}</a>
+          ))}
+        </>
+      ))}
+      {showQuiz && <a href="/rotina" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Teste de pele</a>}
+      <a href="/favoritos" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Favoritos</a>
+      <a href="/sobre" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Sobre</a>
+      <a href="/contato" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Contato</a>
+    </nav>
+  </div>
+</header>
+
+<script is:inline>
+  (function () {
+    const toggle = document.querySelector('[data-menu-toggle]');
+    const menu = document.querySelector('[data-mobile-menu]');
+    if (toggle && menu) {
+      toggle.addEventListener('click', () => menu.classList.toggle('hidden'));
+    }
+  })();
+</script>

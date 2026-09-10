@@ -1,0 +1,243 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import WaveDivider from '../components/WaveDivider.astro';
+import StructuredData from '../components/StructuredData.astro';
+import OffersCarousel from '../components/OffersCarousel.tsx';
+import CategoryAccordion from '../components/CategoryAccordion.tsx';
+import { getCategoryTree, getBestsellers, getProducts } from '../lib/repo/catalog';
+import { getOffers } from '../lib/repo/site';
+import { DEFAULT_OFFERS } from '../lib/site-defaults';
+import { productImage } from '../lib/images';
+import { env } from '../lib/env';
+
+export const prerender = false;
+
+const [tree, bestsellers, offersRaw, allProducts] = await Promise.all([
+  getCategoryTree(),
+  getBestsellers(4),
+  getOffers({ activeOnly: true }),
+  getProducts({}),
+]);
+const offers = offersRaw.length ? offersRaw : DEFAULT_OFFERS;
+
+const productsBySub = new Map<string, { slug: string; name: string }[]>();
+for (const p of allProducts) {
+  const list = productsBySub.get(p.category_slug) ?? [];
+  list.push({ slug: p.slug, name: p.name });
+  productsBySub.set(p.category_slug, list);
+}
+const firstImageInRoot = (rootSlug: string): string => {
+  const sub = tree.find((r) => r.slug === rootSlug)?.children ?? [];
+  for (const s of sub) {
+    const hit = allProducts.find((p) => p.category_slug === s.slug);
+    if (hit?.images[0]) return hit.images[0];
+  }
+  return '';
+};
+
+// Círculos de categoria: raízes + subcategorias, cada uma com a primeira
+// foto de produto que encontrar na sua árvore.
+const catImage = new Map<string, string>();
+for (const p of allProducts) {
+  if (p.images[0] && !catImage.has(p.category_slug)) catImage.set(p.category_slug, p.images[0]);
+}
+const circleCats = tree.flatMap((root) => {
+  const rootImg =
+    catImage.get(root.slug) || root.children.map((c) => catImage.get(c.slug)).find(Boolean) || '';
+  return [
+    { slug: root.slug, name: root.name, image: rootImg },
+    ...root.children.map((c) => ({ slug: c.slug, name: c.name, image: catImage.get(c.slug) || '' })),
+  ];
+});
+
+const accordionRoots = tree.map((root) => ({
+  id: root.id,
+  slug: root.slug,
+  name: root.name,
+  description: root.description,
+  image: root.image_url || firstImageInRoot(root.slug),
+  children: root.children.map((sub) => ({
+    slug: sub.slug,
+    name: sub.name,
+    products: productsBySub.get(sub.slug) ?? [],
+  })),
+}));
+
+const { home_quiz, home_bestsellers, home_story, home_social } = Astro.locals.site;
+const tagline = Astro.locals.site.footer.data.tagline;
+const brandName = Astro.locals.brand.name;
+const storyTitleLines = home_story.data.title.split('\n');
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: brandName,
+  url: env.siteUrl,
+  logo: `${env.siteUrl}/favicon.svg`,
+  description: tagline,
+  sameAs: [],
+};
+---
+
+<BaseLayout title={brandName} description={tagline}>
+  <StructuredData slot="head" data={orgJsonLd} />
+  <h1 class="sr-only">{brandName}</h1>
+
+  <!-- CARROSSEL DE OFERTAS -->
+  <OffersCarousel client:load slides={offers} />
+
+  <div class="tb-marquee" aria-hidden="true">
+    <div class="tb-marquee__track">
+      {[0, 1].map(() => (
+        <span>
+          Envio discreto <b>·</b> +18 <b>·</b> Pix e cartão em até 6x <b>·</b> Curadoria testada de verdade <b>·</b> Troca sem drama <b>·</b>
+        </span>
+      ))}
+    </div>
+  </div>
+
+  <WaveDivider class="text-agua-wash" color="#E3ECE9" />
+
+  <!-- CATEGORIAS (acordeão full-bleed) -->
+  <section class="tb-cat-sec bg-agua-wash py-16 md:py-20">
+    <div class="container-x tb-cat-head">
+      <div class="flex items-end justify-between reveal">
+        <div>
+          <p class="eyebrow">Por onde começar</p>
+          <h2 class="mt-3 font-display text-3xl sm:text-4xl">Categorias</h2>
+        </div>
+        <a href="/loja" class="link-underline hidden font-sans text-[13px] uppercase tracking-[0.14em] text-ink sm:block">
+          Ver tudo
+        </a>
+      </div>
+    </div>
+
+    {circleCats.length > 0 && (
+      <div>
+        <div class="tb-cats reveal mt-6" role="list" aria-label="Atalhos de categoria">
+          {circleCats.map((c) => (
+            <a class="tb-cat" href={`/loja?categoria=${c.slug}`} role="listitem">
+              <span class="tb-cat__disc">
+                {c.image
+                  ? <img src={productImage(c.image, 220)} alt="" loading="lazy" decoding="async" />
+                  : <span>{c.name.slice(0, 1)}</span>}
+              </span>
+              <span class="tb-cat__label">{c.name}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="reveal mt-10">
+      <CategoryAccordion client:visible roots={accordionRoots} />
+    </div>
+  </section>
+
+  <!-- QUIZ CTA -->
+  {home_quiz.is_active && env.quizEnabled && (
+    <section class="py-16 md:py-24">
+      <div class="container-x">
+        <div class="reveal flex flex-col items-start gap-6 rounded-card border border-ink/10 bg-white/50 p-8 md:flex-row md:items-center md:justify-between md:p-12">
+          <div class="max-w-lg">
+            {home_quiz.data.eyebrow && <p class="eyebrow">{home_quiz.data.eyebrow}</p>}
+            <h2 class="mt-3 font-display text-2xl leading-tight sm:text-3xl">
+              {home_quiz.data.title}
+            </h2>
+            {home_quiz.data.body && (
+              <p class="mt-3 font-sans text-[14px] leading-relaxed text-ink-soft">{home_quiz.data.body}</p>
+            )}
+          </div>
+          {home_quiz.data.cta_label && (
+            <a href={home_quiz.data.cta_href || '/rotina'} class="btn-primary shrink-0">{home_quiz.data.cta_label}</a>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- BEST-SELLERS -->
+  {home_bestsellers.is_active && bestsellers.length > 0 && (
+    <section class="pb-16 md:pb-24">
+      <div class="container-x">
+        <div class="reveal">
+          {home_bestsellers.data.eyebrow && <p class="eyebrow">{home_bestsellers.data.eyebrow}</p>}
+          <h2 class="mt-3 font-display text-3xl sm:text-4xl">{home_bestsellers.data.title}</h2>
+        </div>
+        <div class="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4">
+          {bestsellers.map((product) => (
+            <div class="reveal"><ProductCard product={product} /></div>
+          ))}
+        </div>
+        {home_bestsellers.data.cta_label && (
+          <div class="mt-12 text-center">
+            <a href={home_bestsellers.data.cta_href || '/loja'} class="btn-outline">{home_bestsellers.data.cta_label}</a>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- NARRATIVA DA MARCA -->
+  {home_story.is_active && (
+    <section class="bg-ink py-20 text-bone md:py-28">
+      <div class="container-x grid gap-10 md:grid-cols-[1.1fr_1fr] md:items-center md:gap-16">
+        <div class="reveal">
+          {home_story.data.eyebrow && <p class="eyebrow text-agua-light">{home_story.data.eyebrow}</p>}
+          <h2 class="mt-4 font-display text-3xl leading-tight text-bone sm:text-4xl">
+            {storyTitleLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+          </h2>
+          {home_story.data.body && (
+            <p class="mt-6 max-w-lg font-sans text-[15px] leading-relaxed text-bone/70">{home_story.data.body}</p>
+          )}
+          {home_story.data.cta_label && (
+            <a href={home_story.data.cta_href || '/sobre'} class="mt-8 inline-block link-underline font-sans text-[13px] uppercase tracking-[0.14em] text-bone">
+              {home_story.data.cta_label}
+            </a>
+          )}
+        </div>
+        {home_story.data.features.length > 0 && (
+          <ul class="grid gap-4 reveal">
+            {home_story.data.features.map((f) => (
+              <li class="rounded-card border border-bone/15 px-5 py-4">
+                <p class="font-display text-lg text-bone">{f.title}</p>
+                <p class="mt-1 font-sans text-[13px] text-bone/60">{f.body}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- PROVA SOCIAL -->
+  {home_social.is_active && home_social.data.testimonials.length > 0 && (
+    <section class="py-16 md:py-24">
+      <div class="container-x">
+        <div class="flex flex-col items-center text-center reveal">
+          {home_social.data.eyebrow && <p class="eyebrow">{home_social.data.eyebrow}</p>}
+          <h2 class="mt-3 font-display text-3xl sm:text-4xl">{home_social.data.title}</h2>
+          {home_social.data.subtitle && (
+            <p class="mt-2 font-sans text-[13px] text-ink-muted">{home_social.data.subtitle}</p>
+          )}
+        </div>
+        <div class="mt-12 grid gap-6 md:grid-cols-3">
+          {home_social.data.testimonials.map((t) => (
+            <figure class="reveal rounded-card border border-ink/10 bg-white/50 p-6">
+              <div class="flex text-agua" aria-hidden="true">
+                {[1, 2, 3, 4, 5].map(() => (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9L12 3z"/></svg>
+                ))}
+              </div>
+              <blockquote class="mt-4 font-sans text-[14px] leading-relaxed text-ink-soft">“{t.quote}”</blockquote>
+              <figcaption class="mt-4 font-sans text-[13px] text-ink-muted">
+                <span class="font-semibold text-ink">{t.name}</span>{t.detail && <> — {t.detail}</>}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>

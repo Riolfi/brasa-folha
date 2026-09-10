@@ -1,0 +1,27 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminProductForm from '../../../components/AdminProductForm.tsx';
+import { getCategoryTree, getProductById } from '../../../lib/repo/catalog';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const isNew = id === 'novo';
+const tree = await getCategoryTree();
+const product = isNew || !id ? null : await getProductById(id);
+// vem de um scan no leitor sem produto encontrado — o código já chega pronto
+const initialBarcode = isNew ? (Astro.url.searchParams.get('barcode') ?? undefined) : undefined;
+
+if (!isNew && !product) {
+  return Astro.redirect('/admin/produtos');
+}
+---
+
+<AdminLayout title={isNew ? 'Novo produto' : product!.name}>
+  <a href="/admin/produtos" class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted hover:text-ink">
+    ← Produtos
+  </a>
+  <div class="mt-4">
+    <AdminProductForm client:load product={product} tree={tree} initialBarcode={initialBarcode} />
+  </div>
+</AdminLayout>

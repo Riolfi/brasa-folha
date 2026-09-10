@@ -1,0 +1,30 @@
+---
+import { brl, installments } from '../lib/format';
+
+interface Props {
+  priceCents: number;
+  compareAtCents?: number | null;
+  showInstallments?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { priceCents, compareAtCents = null, showInstallments = false, size = 'md' } = Astro.props;
+const hasDiscount = compareAtCents != null && compareAtCents > priceCents;
+const inst = installments(priceCents);
+
+const sizeClass = size === 'lg' ? 'text-2xl' : size === 'sm' ? 'text-sm' : 'text-lg';
+---
+
+<div class="flex flex-col gap-0.5">
+  <div class="flex items-baseline gap-2">
+    <span class:list={['font-display text-ink', sizeClass]}>{brl(priceCents)}</span>
+    {hasDiscount && (
+      <span class="font-sans text-sm text-ink-muted line-through">{brl(compareAtCents!)}</span>
+    )}
+  </div>
+  {showInstallments && inst.count > 1 && (
+    <span class="font-sans text-[13px] text-ink-muted">
+      ou {inst.count}x de {brl(inst.perCents)} sem juros
+    </span>
+  )}
+</div>

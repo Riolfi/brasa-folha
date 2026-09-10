@@ -1,0 +1,23 @@
+---
+interface Props {
+  value: number | null;
+  count?: number;
+  showCount?: boolean;
+}
+const { value, count = 0, showCount = true } = Astro.props;
+const rounded = value ? Math.round(value * 2) / 2 : 0;
+---
+{value && (
+  <div class="flex items-center gap-1.5" aria-label={`Avaliação ${value} de 5`}>
+    <div class="flex text-agua" aria-hidden="true">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill={i <= rounded ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5">
+          <path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9L12 3z" />
+        </svg>
+      ))}
+    </div>
+    {showCount && (
+      <span class="font-sans text-[12px] text-ink-muted">{value.toFixed(1)}{count > 0 && ` (${count})`}</span>
+    )}
+  </div>
+)}

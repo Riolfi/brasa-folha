@@ -1,0 +1,69 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { env } from '../lib/env';
+export const prerender = false;
+
+const email = Astro.locals.site.contact.data.email;
+const brandName = Astro.locals.brand.name;
+---
+
+<LegalLayout
+  title="Termos de Uso"
+  description={`Condições gerais de uso do site e de compra na loja online da ${brandName}.`}
+  updated="29 de agosto de 2026"
+>
+  <h2>1. Aceitação</h2>
+  <p>
+    Ao navegar ou realizar compras neste site, você concorda com estes Termos de Uso e com a
+    Política de Privacidade. Se não concordar, não utilize o site.
+  </p>
+
+  <h2>2. A empresa</h2>
+  <p>
+    Este site é operado pela {env.brandLegalName}, inscrita no CNPJ nº {env.brandCnpj}, com
+    sede no Brasil. O contato oficial é <a href={`mailto:${email}`}>{email}</a>.
+  </p>
+
+  <h2>3. Produtos, preços e disponibilidade</h2>
+  <ul>
+    <li>As imagens são ilustrativas; pode haver pequena variação de cor e embalagem;</li>
+    <li>Preços e condições podem mudar sem aviso, respeitando pedidos já confirmados;</li>
+    <li>Reservamo-nos o direito de cancelar pedidos com erro evidente de preço ou sem estoque, com reembolso integral.</li>
+  </ul>
+
+  <h2>4. Pagamento</h2>
+  <p>
+    Os pagamentos são processados pelo Mercado Pago. Não armazenamos dados completos de cartão em
+    nossos servidores. A confirmação do pedido depende da aprovação do pagamento.
+  </p>
+
+  <h2>5. Entrega</h2>
+  <p>
+    Os prazos exibidos no checkout são estimativas contadas a partir da confirmação do pagamento e
+    podem variar conforme a região e a transportadora.
+  </p>
+
+  <h2>6. Uso adequado dos produtos</h2>
+  <p>
+    Os produtos são cosméticos de uso tópico. Leia o rótulo, faça teste de sensibilidade e, em caso
+    de reação, suspenda o uso e procure um dermatologista. As informações do site não substituem
+    orientação médica.
+  </p>
+
+  <h2>7. Propriedade intelectual</h2>
+  <p>
+    Textos, imagens, marca e identidade visual são de propriedade da {brandName} e não podem ser
+    reproduzidos sem autorização.
+  </p>
+
+  <h2>8. Foro</h2>
+  <p>
+    Fica eleito o foro da comarca da sede da empresa para dirimir eventuais controvérsias, sem
+    prejuízo do direito do consumidor de acionar o foro de seu domicílio.
+  </p>
+
+  <p>
+    Este documento é um modelo e deve ser revisado por um profissional jurídico antes da operação
+    comercial real.
+  </p>
+</LegalLayout>

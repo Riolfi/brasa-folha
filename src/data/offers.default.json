@@ -1,0 +1,36 @@
+[
+  {
+    "id": "0ffe1000-0000-4000-8000-000000000003",
+    "position": 1,
+    "is_active": true,
+    "image_url": "/ofertas/kit-iniciante-desktop.webp",
+    "image_url_mobile": "/ofertas/kit-iniciante-mobile.webp",
+    "eyebrow": "",
+    "title": "",
+    "subtitle": "",
+    "cta_label": "Ver o Kit Narguilé Completo Iniciante",
+    "cta_href": "/produto/kit-narguile-completo-iniciante"
+  },
+  {
+    "id": "0ffe1000-0000-4000-8000-000000000001",
+    "position": 2,
+    "is_active": true,
+    "image_url": "https://images.unsplash.com/photo-1635547821500-77542481940c?auto=format&fit=crop&w=1920&q=70",
+    "eyebrow": "Tabacaria com curadoria",
+    "title": "Acessório que aguenta o uso",
+    "subtitle": "A gente testa tudo antes de vender. Narguilé que não vaza, seda que queima reta, dichavador que não trava.",
+    "cta_label": "Ver a loja",
+    "cta_href": "/loja"
+  },
+  {
+    "id": "0ffe1000-0000-4000-8000-000000000002",
+    "position": 3,
+    "is_active": true,
+    "image_url": "https://images.unsplash.com/photo-1574238752695-675b86d49267?auto=format&fit=crop&w=1920&q=70",
+    "eyebrow": "Primeira vez no narguilé?",
+    "title": "Kit iniciante montado e com desconto",
+    "subtitle": "Narguilé, rosh, prato, carvão, acendedor e uma essência à escolha — tudo em uma caixa.",
+    "cta_label": "Ver os kits",
+    "cta_href": "/loja?categoria=kits"
+  }
+]

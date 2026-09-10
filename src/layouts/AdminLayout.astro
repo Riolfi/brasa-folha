@@ -1,0 +1,80 @@
+---
+import '../styles/global.css';
+import ThemeVars from '../components/ThemeVars.astro';
+import { hasSupabase, hasMercadoPago, hasResend } from '../lib/env';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+const path = Astro.url.pathname;
+const brandName = Astro.locals.brand.name;
+
+const nav = [
+  { href: '/admin', label: 'Painel' },
+  { href: '/admin/caixa', label: 'Caixa' },
+  { href: '/admin/produtos', label: 'Produtos' },
+  { href: '/admin/pedidos', label: 'Pedidos' },
+  { href: '/admin/ofertas', label: 'Ofertas' },
+  { href: '/admin/categorias', label: 'Categorias' },
+  { href: '/admin/site', label: 'Conteúdo' },
+];
+
+const modeLabel = hasSupabase ? 'Supabase' : 'Fallback local (.data/)';
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <ThemeVars />
+    <title>{title} · Admin {brandName}</title>
+  </head>
+  <body class="bg-bone-50">
+    <div class="flex min-h-screen">
+      <aside class="hidden w-56 shrink-0 flex-col border-r border-ink/10 bg-bone px-4 py-6 sm:flex">
+        <a href="/" class="px-2 font-display text-xl lowercase">{brandName}</a>
+        <p class="mt-1 px-2 font-sans text-[11px] uppercase tracking-[0.14em] text-ink-muted">Admin</p>
+        <nav class="mt-8 flex flex-col gap-1">
+          {nav.map((item) => (
+            <a
+              href={item.href}
+              class:list={[
+                'rounded-card px-3 py-2 font-sans text-sm transition-colors',
+                path === item.href || (item.href !== '/admin' && path.startsWith(item.href))
+                  ? 'bg-ink text-bone'
+                  : 'text-ink-soft hover:bg-bone-200',
+              ]}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        <form method="POST" action="/api/admin/logout" class="mt-auto">
+          <button class="w-full rounded-card px-3 py-2 text-left font-sans text-sm text-ink-muted hover:bg-bone-200">
+            Sair
+          </button>
+        </form>
+      </aside>
+
+      <div class="flex-1">
+        <header class="flex items-center justify-between border-b border-ink/10 bg-bone px-6 py-4">
+          <h1 class="font-display text-2xl">{title}</h1>
+          <div class="flex items-center gap-2 font-sans text-[11px] uppercase tracking-[0.1em]">
+            <span class:list={['rounded-full px-2 py-1', hasSupabase ? 'bg-agua-wash text-agua-dark' : 'bg-blush-light text-ink-soft']}>
+              {modeLabel}
+            </span>
+            <span class:list={['rounded-full px-2 py-1', hasMercadoPago ? 'bg-agua-wash text-agua-dark' : 'bg-bone-200 text-ink-muted']}>MP</span>
+            <span class:list={['rounded-full px-2 py-1', hasResend ? 'bg-agua-wash text-agua-dark' : 'bg-bone-200 text-ink-muted']}>E-mail</span>
+          </div>
+        </header>
+        <main class="p-6">
+          <slot />
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

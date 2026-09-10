@@ -1,0 +1,23 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import CategoryForm from '../../../components/CategoryForm.tsx';
+import { getCategories, getCategoryById } from '../../../lib/repo/catalog';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const isNew = id === 'nova';
+const category = isNew || !id ? null : await getCategoryById(id);
+if (!isNew && !category) return Astro.redirect('/admin/categorias');
+
+const all = await getCategories();
+const roots = all.filter((c) => !c.parent_id).map((c) => ({ id: c.id, name: c.name }));
+const parentName = category?.parent_id ? (all.find((c) => c.id === category.parent_id)?.name ?? null) : null;
+---
+
+<AdminLayout title={isNew ? 'Nova categoria' : category!.name}>
+  <a href="/admin/categorias" class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted hover:text-ink">← Categorias</a>
+  <div class="mt-4">
+    <CategoryForm client:load category={category} parentName={parentName} roots={roots} />
+  </div>
+</AdminLayout>

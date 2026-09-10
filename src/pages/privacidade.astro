@@ -1,0 +1,76 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { env } from '../lib/env';
+export const prerender = false;
+
+const email = Astro.locals.site.contact.data.email;
+const brandName = Astro.locals.brand.name;
+---
+
+<LegalLayout
+  title="Política de Privacidade"
+  description={`Como a ${brandName} coleta, usa e protege seus dados pessoais, em conformidade com a LGPD (Lei nº 13.709/2018).`}
+  updated="29 de agosto de 2026"
+>
+  <p>
+    Esta política descreve como a {env.brandLegalName} ("{brandName}") trata dados pessoais, em
+    conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 — LGPD).
+  </p>
+
+  <h2>1. Dados que coletamos</h2>
+  <ul>
+    <li><strong>Dados de cadastro e pedido:</strong> nome, e-mail, telefone, CPF e endereço de entrega;</li>
+    <li><strong>Dados de pagamento:</strong> processados diretamente pelo Mercado Pago; recebemos apenas o status da transação e um identificador;</li>
+    <li><strong>Dados de navegação:</strong> páginas visitadas, dispositivo e cookies necessários ao funcionamento do carrinho.</li>
+  </ul>
+
+  <h2>2. Para que usamos</h2>
+  <ul>
+    <li>Processar e entregar seus pedidos e emitir nota fiscal;</li>
+    <li>Prestar atendimento e responder contatos;</li>
+    <li>Prevenir fraudes e cumprir obrigações legais e fiscais;</li>
+    <li>Enviar comunicações sobre o pedido (transacionais).</li>
+  </ul>
+
+  <h2>3. Base legal</h2>
+  <p>
+    Tratamos dados para execução de contrato (art. 7º, V), cumprimento de obrigação legal (art. 7º,
+    II), e, quando aplicável, mediante seu consentimento (art. 7º, I).
+  </p>
+
+  <h2>4. Compartilhamento</h2>
+  <p>
+    Compartilhamos dados apenas com operadores necessários à entrega do serviço: processador de
+    pagamento (Mercado Pago), transportadoras, provedor de e-mail transacional e infraestrutura de
+    hospedagem. Não vendemos seus dados.
+  </p>
+
+  <h2>5. Armazenamento e segurança</h2>
+  <p>
+    Os dados são armazenados em servidores com controle de acesso e criptografia em trânsito.
+    Retemos os dados de pedido pelo prazo exigido pela legislação fiscal (mínimo de 5 anos).
+  </p>
+
+  <h2>6. Seus direitos</h2>
+  <p>
+    Você pode solicitar confirmação de tratamento, acesso, correção, anonimização, portabilidade e
+    eliminação dos seus dados, além de revogar consentimentos. Basta escrever para
+    <a href={`mailto:${email}`}>{email}</a>.
+  </p>
+
+  <h2>7. Cookies</h2>
+  <p>
+    Usamos cookies estritamente necessários (carrinho e sessão). Você pode bloqueá-los no navegador,
+    ciente de que isso pode afetar o funcionamento da loja.
+  </p>
+
+  <h2>8. Encarregado (DPO)</h2>
+  <p>
+    Contato do encarregado pelo tratamento de dados: <a href={`mailto:${email}`}>{email}</a>.
+  </p>
+
+  <p>
+    Este documento é um modelo e deve ser revisado por um profissional jurídico antes da operação
+    comercial real.
+  </p>
+</LegalLayout>

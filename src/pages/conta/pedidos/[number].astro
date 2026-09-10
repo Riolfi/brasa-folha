@@ -1,0 +1,63 @@
+---
+import AccountLayout from '../../../layouts/AccountLayout.astro';
+import { getUserOrder } from '../../../lib/repo/orders';
+import { brl } from '../../../lib/format';
+import { ORDER_STATUS_LABELS } from '../../../lib/types';
+
+export const prerender = false;
+
+const user = Astro.locals.user!;
+const { number } = Astro.params;
+const order = number ? await getUserOrder(user.id, number) : null;
+if (!order) return Astro.redirect('/conta/pedidos');
+
+const a = order.shipping_address;
+---
+
+<AccountLayout title={`Pedido ${order.order_number}`} active="pedidos">
+  <a href="/conta/pedidos" class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted hover:text-ink">← Meus pedidos</a>
+
+  <div class="mt-4 flex flex-wrap items-center gap-3">
+    <span class="rounded-full bg-agua-wash px-3 py-1 font-sans text-[12px] uppercase tracking-[0.1em] text-agua-dark">
+      {ORDER_STATUS_LABELS[order.status]}
+    </span>
+    <span class="font-sans text-[13px] text-ink-muted">
+      {new Date(order.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+    </span>
+  </div>
+
+  {order.tracking_code && (
+    <div class="mt-4 rounded-card border border-agua/40 bg-agua-wash px-4 py-3 text-[14px] text-ink-soft">
+      <span class="font-medium text-agua-dark">Código de rastreio:</span> {order.tracking_code}
+    </div>
+  )}
+
+  <div class="mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+    <section class="rounded-card border border-ink/10 bg-white/50 p-5">
+      <h2 class="font-display text-lg">Itens</h2>
+      <ul class="mt-3 divide-y divide-ink/10">
+        {order.items.map((i) => (
+          <li class="flex items-center justify-between py-3 text-[14px]">
+            <span class="text-ink">{i.product_name} <span class="text-ink-muted">× {i.quantity}</span></span>
+            <span>{brl(i.unit_price_cents * i.quantity)}</span>
+          </li>
+        ))}
+      </ul>
+      <dl class="mt-4 space-y-1.5 border-t border-ink/10 pt-3 text-[14px] text-ink-soft">
+        <div class="flex justify-between"><dt>Subtotal</dt><dd>{brl(order.subtotal_cents)}</dd></div>
+        <div class="flex justify-between"><dt>Frete</dt><dd>{order.shipping_cents === 0 ? 'Grátis' : brl(order.shipping_cents)}</dd></div>
+        <div class="flex justify-between border-t border-ink/10 pt-2 font-display text-lg text-ink"><dt>Total</dt><dd>{brl(order.total_cents)}</dd></div>
+      </dl>
+    </section>
+
+    <section class="rounded-card border border-ink/10 bg-white/50 p-5 text-[14px] text-ink-soft">
+      <h2 class="font-display text-lg text-ink">Entrega</h2>
+      <p class="mt-2">
+        {a.street}, {a.number}{a.complement ? ` — ${a.complement}` : ''}<br />
+        {a.district} — {a.city}/{a.state}<br />
+        CEP {a.cep}
+      </p>
+      <p class="mt-4 text-[12px] text-ink-muted">Pagamento: {order.payment_method ?? '—'}</p>
+    </section>
+  </div>
+</AccountLayout>

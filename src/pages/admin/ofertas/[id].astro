@@ -1,0 +1,20 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import OfferForm from '../../../components/OfferForm.tsx';
+import { getOfferById } from '../../../lib/repo/site';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const isNew = id === 'nova';
+const offer = isNew || !id ? null : await getOfferById(id);
+
+if (!isNew && !offer) return Astro.redirect('/admin/ofertas');
+---
+
+<AdminLayout title={isNew ? 'Nova oferta' : offer!.title || 'Oferta'}>
+  <a href="/admin/ofertas" class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted hover:text-ink">← Ofertas</a>
+  <div class="mt-4">
+    <OfferForm client:load offer={offer} />
+  </div>
+</AdminLayout>

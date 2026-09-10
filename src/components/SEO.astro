@@ -1,0 +1,38 @@
+---
+import { env } from '../lib/env';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  noindex?: boolean;
+  type?: 'website' | 'article' | 'product';
+}
+
+const { title, description, image, noindex = false, type = 'website' } = Astro.props;
+
+const siteName = Astro.locals.brand?.name ?? env.brandName;
+const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
+const canonical = new URL(Astro.url.pathname, env.siteUrl).href.replace(/\/$/, '') || env.siteUrl;
+const ogImage = image
+  ? new URL(image, env.siteUrl).href
+  : new URL('/og-default.svg', env.siteUrl).href;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<meta property="og:site_name" content={siteName} />
+<meta property="og:type" content={type} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:locale" content="pt_BR" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />

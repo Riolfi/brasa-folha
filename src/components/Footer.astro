@@ -1,0 +1,76 @@
+---
+import { getCategoryTree } from '../lib/repo/catalog';
+import { env } from '../lib/env';
+import WaveDivider from './WaveDivider.astro';
+
+const tree = await getCategoryTree();
+const year = new Date().getFullYear();
+const { footer, contact } = Astro.locals.site;
+const brandName = Astro.locals.brand.name;
+const wppNumber = contact.data.whatsapp_number || env.whatsappNumber;
+const wpp = `https://wa.me/${wppNumber}`;
+---
+
+<footer class="mt-24 bg-ink text-bone">
+  <div class="text-bone">
+    <WaveDivider class="text-ink" flip color="#F6F3EE" />
+  </div>
+  <div class="container-x grid gap-12 py-16 md:grid-cols-4">
+    <div class="md:col-span-1">
+      <p class="font-display text-2xl lowercase">{brandName}</p>
+      <p class="mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone/60">
+        {footer.data.tagline}
+      </p>
+    </div>
+
+    <nav aria-label="Loja">
+      <p class="eyebrow text-agua-light">Loja</p>
+      <ul class="mt-4 space-y-2.5">
+        <li><a href="/loja" class="font-sans text-sm text-bone/70 hover:text-bone">Todos os produtos</a></li>
+        {tree.map((root) => (
+          <li>
+            <a href={`/loja?categoria=${root.slug}`} class="font-sans text-sm text-bone hover:text-bone">{root.name}</a>
+            {root.children.length > 0 && (
+              <ul class="mt-1.5 space-y-1 pl-3">
+                {root.children.map((sub) => (
+                  <li><a href={`/loja?categoria=${sub.slug}`} class="font-sans text-[13px] text-bone/60 hover:text-bone">{sub.name}</a></li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav aria-label="Institucional">
+      <p class="eyebrow text-agua-light">A marca</p>
+      <ul class="mt-4 space-y-2.5">
+        <li><a href="/sobre" class="font-sans text-sm text-bone/70 hover:text-bone">Sobre a {brandName}</a></li>
+        <li><a href="/contato" class="font-sans text-sm text-bone/70 hover:text-bone">Contato</a></li>
+        <li><a href="/politica-trocas" class="font-sans text-sm text-bone/70 hover:text-bone">Trocas e devoluções</a></li>
+        <li><a href="/termos" class="font-sans text-sm text-bone/70 hover:text-bone">Termos de uso</a></li>
+        <li><a href="/privacidade" class="font-sans text-sm text-bone/70 hover:text-bone">Privacidade (LGPD)</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <p class="eyebrow text-agua-light">Atendimento</p>
+      <ul class="mt-4 space-y-2.5">
+        <li><a href={wpp} class="font-sans text-sm text-bone/70 hover:text-bone">WhatsApp</a></li>
+        {contact.data.email && (
+          <li><a href={`mailto:${contact.data.email}`} class="font-sans text-sm text-bone/70 hover:text-bone">{contact.data.email}</a></li>
+        )}
+      </ul>
+      <p class="mt-6 font-sans text-xs leading-relaxed text-bone/40">
+        {contact.data.hours}{footer.data.returns_line && <><br />{footer.data.returns_line}</>}
+      </p>
+    </div>
+  </div>
+
+  <div class="border-t border-bone/10">
+    <div class="container-x flex flex-col gap-2 py-6 text-xs text-bone/40 sm:flex-row sm:items-center sm:justify-between">
+      <p>© {year} {footer.data.legal_line}</p>
+      <p>{footer.data.payment_line}</p>
+    </div>
+  </div>
+</footer>

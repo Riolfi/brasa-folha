@@ -1,0 +1,42 @@
+---
+import type { User } from '@supabase/supabase-js';
+
+interface Props {
+  user: User | null;
+}
+const { user } = Astro.props;
+const firstName =
+  (user?.user_metadata?.full_name as string | undefined)?.trim().split(/\s+/)[0] ||
+  user?.email?.split('@')[0] ||
+  'Conta';
+---
+
+{user ? (
+  <details class="group relative">
+    <summary class="flex cursor-pointer list-none items-center gap-1.5 font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark [&::-webkit-details-marker]:hidden">
+      <span class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink/20">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20a8 8 0 0 1 16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </span>
+      <span class="hidden max-w-[8ch] truncate sm:inline">{firstName}</span>
+    </summary>
+    <div class="absolute right-0 top-full z-50 w-52 pt-3">
+      <ul class="rounded-card border border-ink/10 bg-bone p-2 shadow-lg">
+        <li><a href="/conta" class="block rounded-card px-3 py-2 font-sans text-sm text-ink-soft hover:bg-bone-200 hover:text-ink">Minha conta</a></li>
+        <li><a href="/conta/pedidos" class="block rounded-card px-3 py-2 font-sans text-sm text-ink-soft hover:bg-bone-200 hover:text-ink">Meus pedidos</a></li>
+        <li><a href="/conta/enderecos" class="block rounded-card px-3 py-2 font-sans text-sm text-ink-soft hover:bg-bone-200 hover:text-ink">Endereços</a></li>
+        <li class="mt-1 border-t border-ink/10 pt-1">
+          <form method="POST" action="/auth/sair">
+            <button class="w-full rounded-card px-3 py-2 text-left font-sans text-sm text-ink-muted hover:bg-bone-200 hover:text-ink">Sair</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  </details>
+) : (
+  <a href="/entrar" class="inline-flex items-center gap-2 font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark">
+    <span class="hidden sm:inline">Entrar</span>
+    <span class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink/20 sm:hidden">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20a8 8 0 0 1 16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </span>
+  </a>
+)}

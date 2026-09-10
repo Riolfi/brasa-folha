@@ -1,0 +1,67 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getOffers } from '../../../lib/repo/site';
+
+export const prerender = false;
+
+const offers = await getOffers();
+---
+
+<AdminLayout title="Ofertas">
+  <div class="flex items-center justify-between">
+    <p class="font-sans text-sm text-ink-muted">
+      {offers.length} {offers.length === 1 ? 'slide' : 'slides'} no carrossel da home. Arraste para reordenar.
+    </p>
+    <a href="/admin/ofertas/nova" class="btn-primary">Nova oferta</a>
+  </div>
+
+  <ul id="offer-list" class="mt-6 space-y-3">
+    {offers.map((o) => (
+      <li
+        class="flex items-center gap-4 rounded-card border border-ink/10 bg-white p-3"
+        draggable="true"
+        data-id={o.id}
+      >
+        <span class="cursor-grab select-none px-1 text-ink-muted" aria-hidden="true">⠿</span>
+        <div class="h-14 w-24 shrink-0 overflow-hidden rounded-card bg-bone-200">
+          {o.image_url && <img src={o.image_url} alt="" class="h-full w-full object-cover" />}
+        </div>
+        <div class="min-w-0 flex-1">
+          <a href={`/admin/ofertas/${o.id}`} class="font-medium text-agua-dark">{o.title || '(sem título)'}</a>
+          <p class="truncate text-[12px] text-ink-muted">
+            {o.cta_label ? `${o.cta_label} → ${o.cta_href}` : 'sem botão'}
+          </p>
+        </div>
+        <span class:list={['rounded-full px-2 py-0.5 text-[11px] uppercase', o.is_active ? 'bg-agua-wash text-agua-dark' : 'bg-bone-200 text-ink-muted']}>
+          {o.is_active ? 'ativa' : 'oculta'}
+        </span>
+      </li>
+    ))}
+  </ul>
+</AdminLayout>
+
+<script>
+  const listEl = document.getElementById('offer-list');
+  if (listEl) {
+    let dragEl: HTMLElement | null = null;
+    listEl.querySelectorAll<HTMLElement>('li').forEach((li) => {
+      li.addEventListener('dragstart', () => { dragEl = li; li.style.opacity = '0.4'; });
+      li.addEventListener('dragend', async () => {
+        li.style.opacity = '';
+        const ids = [...listEl.querySelectorAll('li')].map((x) => x.dataset.id);
+        await fetch('/api/admin/offers?action=reorder', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ ids }),
+        });
+      });
+      li.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!dragEl || dragEl === li) return;
+        const rect = li.getBoundingClientRect();
+        const after = (e as DragEvent).clientY > rect.top + rect.height / 2;
+        listEl.insertBefore(dragEl, after ? li.nextSibling : li);
+      });
+    });
+  }
+</script>

@@ -1,0 +1,495 @@
+{
+  "categories": [
+    {
+      "id": "cb700000-0000-4000-8000-000000000010",
+      "slug": "narguile",
+      "name": "Narguilé",
+      "description": "Do vaso ao rosh — tudo para uma sessão redonda.",
+      "position": 1,
+      "image_url": "/produtos/narguile-landscape.jpg",
+      "parent_id": null
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000011",
+      "slug": "para-fumar",
+      "name": "Para fumar",
+      "description": "Sedas, dichavadores, isqueiros e cinzeiros.",
+      "position": 2,
+      "image_url": "/produtos/teste2.jpg",
+      "parent_id": null
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000012",
+      "slug": "kits",
+      "name": "Kits",
+      "description": "Combos montados para começar sem erro.",
+      "position": 3,
+      "image_url": "/produtos/teste.jpg",
+      "parent_id": null
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000020",
+      "slug": "narguiles-completos",
+      "name": "Narguilés completos",
+      "description": "Prontos para montar e usar.",
+      "position": 1,
+      "image_url": "/produtos/teste2.jpg",
+      "parent_id": "cb700000-0000-4000-8000-000000000010"
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000021",
+      "slug": "rosh-e-acessorios",
+      "name": "Rosh & acessórios",
+      "description": "Rosh, pratos, abafadores e mangueiras.",
+      "position": 2,
+      "image_url": "",
+      "parent_id": "cb700000-0000-4000-8000-000000000010"
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000022",
+      "slug": "essencias",
+      "name": "Essências",
+      "description": "Sabores em lata de 50 g e 250 g.",
+      "position": 3,
+      "image_url": "",
+      "parent_id": "cb700000-0000-4000-8000-000000000010"
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000023",
+      "slug": "carvao",
+      "name": "Carvão",
+      "description": "Carvão de coco e acendedores.",
+      "position": 4,
+      "image_url": "",
+      "parent_id": "cb700000-0000-4000-8000-000000000010"
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000030",
+      "slug": "sedas-e-piteiras",
+      "name": "Sedas & piteiras",
+      "description": "Sedas, blocos e piteiras de vidro.",
+      "position": 1,
+      "image_url": "",
+      "parent_id": "cb700000-0000-4000-8000-000000000011"
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000031",
+      "slug": "dichavadores",
+      "name": "Dichavadores",
+      "description": "Alumínio, acrílico e com coletor.",
+      "position": 2,
+      "image_url": "",
+      "parent_id": "cb700000-0000-4000-8000-000000000011"
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000032",
+      "slug": "isqueiros-e-macaricos",
+      "name": "Isqueiros & maçaricos",
+      "description": "Chama comum e maçarico antivento.",
+      "position": 3,
+      "image_url": "",
+      "parent_id": "cb700000-0000-4000-8000-000000000011"
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000033",
+      "slug": "cinzeiros",
+      "name": "Cinzeiros",
+      "description": "Vidro, cerâmica e portáteis.",
+      "position": 4,
+      "image_url": "",
+      "parent_id": "cb700000-0000-4000-8000-000000000011"
+    },
+    {
+      "id": "cb700000-0000-4000-8000-000000000040",
+      "slug": "kits-prontos",
+      "name": "Kits prontos",
+      "description": "Combos com desconto.",
+      "position": 1,
+      "image_url": "",
+      "parent_id": "cb700000-0000-4000-8000-000000000012"
+    }
+  ],
+  "products": [
+    {
+      "id": "d1000000-0000-4000-8000-000000000001",
+      "slug": "narguile-medio-aluminio-preto",
+      "name": "Narguilé Médio Alumínio Preto",
+      "category_slug": "narguiles-completos",
+      "short_description": "80 cm de alumínio anodizado, vaso de vidro e mangueira lavável.",
+      "description": "Estrutura de alumínio anodizado que não enferruja, com 80 cm de altura — o tamanho que equilibra tiragem e portabilidade. Acompanha vaso de vidro jateado, prato removível, mangueira de silicone lavável e piteira. Rosca vedada em todas as conexões para não perder fumaça.",
+      "ingredients": "Corpo em alumínio anodizado, vaso em vidro, mangueira em silicone.",
+      "how_to_use": "Lave o vaso e a mangueira com água morna após o uso. Seque o corpo para preservar o anodizado.",
+      "price_cents": 18900,
+      "compare_at_price_cents": null,
+      "stock": 12,
+      "is_active": true,
+      "is_bestseller": true,
+      "rating": 4.7,
+      "reviews_count": 53,
+      "images": [
+        "/produtos/narguile-preto.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000002",
+      "slug": "narguile-pequeno-portatil-35cm",
+      "name": "Narguilé Pequeno Portátil 35 cm",
+      "category_slug": "narguiles-completos",
+      "short_description": "Compacto, desmonta em segundos e cabe na mochila.",
+      "description": "Para levar para a casa de amigos ou para a viagem. 35 cm, desmontável, com estojo. A tiragem é mais curta que a de um médio, mas a vedação é a mesma — sessão honesta em qualquer lugar.",
+      "ingredients": "Alumínio e vidro.",
+      "how_to_use": "Enxágue e seque antes de guardar no estojo.",
+      "price_cents": 14900,
+      "compare_at_price_cents": null,
+      "stock": 18,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.4,
+      "reviews_count": 21,
+      "images": [
+        "/produtos/narguile-pequeno.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000003",
+      "slug": "rosh-de-barro-artesanal",
+      "name": "Rosh de Barro Artesanal",
+      "category_slug": "rosh-e-acessorios",
+      "short_description": "Queima mais lenta e uniforme — o barro segura o calor.",
+      "description": "Rosh tradicional de barro cru, feito à mão. O barro distribui o calor de forma mais suave que o alumínio, o que rende sessões mais longas e sem gosto de queimado. Furos calibrados para não deixar a essência escorrer.",
+      "ingredients": "Barro cru.",
+      "how_to_use": "Cure antes do primeiro uso queimando um carvão sem essência. Não lave com sabão.",
+      "price_cents": 3500,
+      "compare_at_price_cents": null,
+      "stock": 40,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.6,
+      "reviews_count": 38,
+      "images": [
+        "/produtos/rosh-barro.png"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000004",
+      "slug": "rosh-phunnel-aluminio",
+      "name": "Rosh Phunnel Alumínio",
+      "category_slug": "rosh-e-acessorios",
+      "short_description": "Furo central único — a calda não vaza para o prato.",
+      "description": "O formato phunnel mantém a essência e o melaço dentro do rosh, sem escorrer. Alumínio fundido, fácil de limpar, com borda alta para acomodar bastante fumo. Combina com abafador.",
+      "ingredients": "Alumínio fundido.",
+      "how_to_use": "Lave com água quente. Pode ir à máquina de lavar louça.",
+      "price_cents": 4500,
+      "compare_at_price_cents": null,
+      "stock": 30,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.5,
+      "reviews_count": 27,
+      "images": [
+        "/produtos/rosh-aluminio.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000005",
+      "slug": "prato-universal-inox",
+      "name": "Prato Universal Inox",
+      "category_slug": "rosh-e-acessorios",
+      "short_description": "Encaixa na maioria dos corpos e segura carvão e pinça.",
+      "description": "Prato de inox escovado de 14 cm, com furo central de tamanho universal. Borda funda para segurar as brasas e a pinça sem bagunça.",
+      "ingredients": "Aço inox.",
+      "how_to_use": "Lave normalmente. Não risca.",
+      "price_cents": 3900,
+      "compare_at_price_cents": null,
+      "stock": 25,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.3,
+      "reviews_count": 12,
+      "images": [
+        "/produtos/prato.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000006",
+      "slug": "essencia-zomo-tradicional-50g",
+      "name": "Essência Zomo Tradicional 50 g",
+      "category_slug": "essencias",
+      "short_description": "Linha nacional, fumaça densa e sabor redondo.",
+      "description": "Essência brasileira à base de folha de tabaco com melaço e glicerina. 50 g rendem cerca de 3 sessões. Sabores da linha tradicional em estoque rotativo — informe a preferência no checkout.",
+      "ingredients": "Folha de tabaco, melaço, glicerina vegetal, aromatizantes.",
+      "how_to_use": "Mantenha a lata fechada e ao abrigo de luz. Contém nicotina.",
+      "price_cents": 2200,
+      "compare_at_price_cents": null,
+      "stock": 60,
+      "is_active": true,
+      "is_bestseller": true,
+      "rating": 4.6,
+      "reviews_count": 71,
+      "images": [
+        "/produtos/essencia-zomo-1.png",
+        "/produtos/essencia-zomo-2.png",
+        "/produtos/essencia-zomo-3.png"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000007",
+      "slug": "essencia-adalya-love-66-50g",
+      "name": "Essência Adalya Love 66 · 50 g",
+      "category_slug": "essencias",
+      "short_description": "O clássico frutado da Adalya: melancia, melão e menta.",
+      "description": "Importada da Turquia, corte fino e bem melado. Love 66 mistura melancia, melão e um toque de menta — o sabor de entrada mais pedido. 50 g.",
+      "ingredients": "Folha de tabaco, melaço, glicerina, aromatizantes.",
+      "how_to_use": "Guarde fechada. Contém nicotina.",
+      "price_cents": 3490,
+      "compare_at_price_cents": null,
+      "stock": 35,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.8,
+      "reviews_count": 44,
+      "images": [
+        "/produtos/adalya.png"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000008",
+      "slug": "essencia-element-agua-50g",
+      "name": "Essência Element Água · 50 g",
+      "category_slug": "essencias",
+      "short_description": "Linha sem nicotina à base de cana — para sessões mais leves.",
+      "description": "A linha Água da Element não usa folha de tabaco: a base é bagaço de cana. Fumaça igualmente densa, sem nicotina. Bom para quem quer sessão longa sem o efeito do tabaco.",
+      "ingredients": "Bagaço de cana, melaço, glicerina, aromatizantes. Sem nicotina.",
+      "how_to_use": "Guarde fechada e seca.",
+      "price_cents": 3290,
+      "compare_at_price_cents": null,
+      "stock": 28,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.4,
+      "reviews_count": 19,
+      "images": [
+        "/produtos/element.png"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000009",
+      "slug": "carvao-de-coco-250g-hexagonal",
+      "name": "Carvão de Coco 250 g · Hexagonal",
+      "category_slug": "carvao",
+      "short_description": "Acende rápido, dura ~45 min e quase não solta cheiro.",
+      "description": "Carvão prensado de casca de coco, formato hexagonal (queima mais uniforme que o cúbico). Caixa com 250 g, cerca de 18 unidades. Pouca cinza, sem faísca.",
+      "ingredients": "Casca de coco prensada.",
+      "how_to_use": "Acenda no fogão elétrico ou no acendedor até ficar todo alaranjado antes de colocar no prato.",
+      "price_cents": 2900,
+      "compare_at_price_cents": null,
+      "stock": 80,
+      "is_active": true,
+      "is_bestseller": true,
+      "rating": 4.7,
+      "reviews_count": 96,
+      "images": [
+        "/produtos/carvao-coco.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000010",
+      "slug": "acendedor-de-carvao-eletrico",
+      "name": "Acendedor de Carvão Elétrico",
+      "category_slug": "carvao",
+      "short_description": "Resistência em espiral: carvão pronto em 4 minutos.",
+      "description": "Acendedor com resistência de 1000 W e base de apoio. Acende de 2 a 4 carvões por vez sem precisar de fogão. Cabo de 1,4 m.",
+      "ingredients": "Resistência metálica, base cerâmica.",
+      "how_to_use": "Deixe esfriar completamente antes de guardar. Não deixe ligado sem carvão.",
+      "price_cents": 8900,
+      "compare_at_price_cents": null,
+      "stock": 15,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.5,
+      "reviews_count": 23,
+      "images": [
+        "/produtos/acendedor.png"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000011",
+      "slug": "seda-king-size-slim-bloco-32",
+      "name": "Seda King Size Slim · Bloco 32 un",
+      "category_slug": "sedas-e-piteiras",
+      "short_description": "Papel fino de arroz, goma vegetal, queima reta.",
+      "description": "Bloco com 32 livretos de seda King Size Slim (110 mm). Papel de arroz ultrafino com goma natural — queima devagar e sem sabor de papel.",
+      "ingredients": "Papel de arroz, goma arábica.",
+      "how_to_use": "",
+      "price_cents": 2800,
+      "compare_at_price_cents": null,
+      "stock": 100,
+      "is_active": true,
+      "is_bestseller": true,
+      "rating": 4.6,
+      "reviews_count": 64,
+      "images": [
+        "/produtos/seda-slim.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000012",
+      "slug": "piteira-de-vidro-reutilizavel",
+      "name": "Piteira de Vidro Reutilizável",
+      "category_slug": "sedas-e-piteiras",
+      "short_description": "Não amassa, não molha e melhora o tiro. Com 3 unidades.",
+      "description": "Piteiras de vidro borossilicato de 8 mm, resistentes ao calor. Reutilizáveis: lava e usa de novo. Pack com 3 e estojo de silicone.",
+      "ingredients": "Vidro borossilicato.",
+      "how_to_use": "Lave com água quente ou álcool isopropílico.",
+      "price_cents": 1900,
+      "compare_at_price_cents": null,
+      "stock": 70,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.4,
+      "reviews_count": 31,
+      "images": [
+        "/produtos/piteira-vidro.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000013",
+      "slug": "dichavador-aluminio-4-partes-63mm",
+      "name": "Dichavador de Alumínio 4 Partes 63 mm",
+      "category_slug": "dichavadores",
+      "short_description": "Dentes em diamante, tela e compartimento coletor.",
+      "description": "Alumínio aeronáutico anodizado, 63 mm, 4 partes com rosca. Dentes cortados a laser em formato diamante, tela de inox e compartimento inferior para o pólen. Ímã no topo.",
+      "ingredients": "Alumínio anodizado, tela em inox.",
+      "how_to_use": "Bata as partes para soltar o resíduo. Limpe a tela com álcool isopropílico.",
+      "price_cents": 5900,
+      "compare_at_price_cents": null,
+      "stock": 22,
+      "is_active": true,
+      "is_bestseller": true,
+      "rating": 4.8,
+      "reviews_count": 57,
+      "images": [
+        "/produtos/dichavador-aluminio-4partes1.webp",
+        "/produtos/dichavador-aluminio-4partes2.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000014",
+      "slug": "dichavador-acrilico-transparente",
+      "name": "Dichavador Acrílico Transparente",
+      "category_slug": "dichavadores",
+      "short_description": "Leve, barato e você enxerga o ponto certo.",
+      "description": "Dichavador de acrílico de 3 partes, 55 mm. Transparente para acompanhar a moagem. Dentes reforçados. Opção de entrada.",
+      "ingredients": "Acrílico.",
+      "how_to_use": "Lave só com água — álcool pode esbranquiçar o acrílico.",
+      "price_cents": 2500,
+      "compare_at_price_cents": null,
+      "stock": 45,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.1,
+      "reviews_count": 18,
+      "images": [
+        "/produtos/dichavador-acrilico.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000015",
+      "slug": "isqueiro-macarico-antivento",
+      "name": "Isqueiro Maçarico Antivento",
+      "category_slug": "isqueiros-e-macaricos",
+      "short_description": "Chama azul de 1300 °C que não apaga no vento.",
+      "description": "Maçarico recarregável a gás butano, chama única azul, trava de segurança e janela de nível. Acende carvão e resiste ao vento — bom para sessão ao ar livre.",
+      "ingredients": "Corpo em metal e ABS.",
+      "how_to_use": "Recarregue com gás butano refinado. Regule a chama no parafuso da base.",
+      "price_cents": 3900,
+      "compare_at_price_cents": null,
+      "stock": 30,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.5,
+      "reviews_count": 40,
+      "images": [
+        "/produtos/isqueiro-macarico.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000016",
+      "slug": "cinzeiro-de-vidro-grande",
+      "name": "Cinzeiro de Vidro Grande",
+      "category_slug": "cinzeiros",
+      "short_description": "Vidro pesado de 13 cm, quatro descansos e fundo fundo.",
+      "description": "Cinzeiro de vidro prensado espesso, 13 cm, com quatro entalhes de descanso e cavidade funda que segura bastante cinza. Base larga que não tomba.",
+      "ingredients": "Vidro prensado.",
+      "how_to_use": "Lava na pia ou na máquina.",
+      "price_cents": 4500,
+      "compare_at_price_cents": null,
+      "stock": 25,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.6,
+      "reviews_count": 15,
+      "images": [
+        "/produtos/cinzeiro-vidro.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000017",
+      "slug": "kit-narguile-completo-iniciante",
+      "name": "Kit Narguilé Completo Iniciante",
+      "category_slug": "kits-prontos",
+      "short_description": "Narguilé médio + rosh + prato + carvão + acendedor + essência.",
+      "description": "Tudo para a primeira sessão em uma caixa: narguilé médio de alumínio, rosh phunnel, prato inox, uma lata de carvão de coco, acendedor elétrico e uma essência de 50 g à escolha. Com desconto sobre os itens separados.",
+      "ingredients": "Ver itens individuais.",
+      "how_to_use": "Ver instruções de cada item.",
+      "price_cents": 27900,
+      "compare_at_price_cents": 33800,
+      "stock": 10,
+      "is_active": true,
+      "is_bestseller": true,
+      "rating": 4.7,
+      "reviews_count": 29,
+      "images": [
+        "/produtos/kit-iniciante.webp"
+      ],
+      "attributes": {}
+    },
+    {
+      "id": "d1000000-0000-4000-8000-000000000018",
+      "slug": "kit-rolar-seda-piteira-dichavador-cinzeiro",
+      "name": "Kit Rolar · Seda + Piteira + Dichavador + Cinzeiro",
+      "category_slug": "kits-prontos",
+      "short_description": "O básico do rolo em um combo com desconto.",
+      "description": "Um bloco de seda King Size Slim, um pack de 3 piteiras de vidro, o dichavador de alumínio 4 partes e o cinzeiro de vidro grande. Combo com preço fechado.",
+      "ingredients": "Ver itens individuais.",
+      "how_to_use": "Ver instruções de cada item.",
+      "price_cents": 9900,
+      "compare_at_price_cents": 13100,
+      "stock": 14,
+      "is_active": true,
+      "is_bestseller": false,
+      "rating": 4.5,
+      "reviews_count": 17,
+      "images": [
+        "/produtos/kit-pala.webp"
+      ],
+      "attributes": {}
+    }
+  ]
+}

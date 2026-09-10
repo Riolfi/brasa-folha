@@ -1,0 +1,192 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import ProductGallery from '../../components/ProductGallery.tsx';
+import AddToCartButton from '../../components/AddToCartButton.tsx';
+import FavoriteButton from '../../components/FavoriteButton.tsx';
+import PriceDisplay from '../../components/PriceDisplay.astro';
+import Rating from '../../components/Rating.astro';
+import StructuredData from '../../components/StructuredData.astro';
+import WaveDivider from '../../components/WaveDivider.astro';
+import { getProductBySlug, getRelatedProducts } from '../../lib/repo/catalog';
+import { firstImage, productImage } from '../../lib/images';
+import { env } from '../../lib/env';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const product = slug ? await getProductBySlug(slug) : null;
+
+if (!product || !product.is_active) {
+  return Astro.redirect('/loja', 302);
+}
+
+const related = await getRelatedProducts(product, 4);
+const soldOut = product.stock <= 0;
+const lowStock = !soldOut && product.stock <= 5;
+
+const cartLine = {
+  productId: product.id,
+  slug: product.slug,
+  name: product.name,
+  priceCents: product.price_cents,
+  image: product.images[0] ?? '',
+  stock: product.stock,
+};
+
+const sections = [
+  { title: 'Descrição', body: product.description },
+  { title: 'Ingredientes', body: product.ingredients },
+  { title: 'Modo de uso', body: product.how_to_use },
+].filter((s) => s.body?.trim());
+
+const productJsonLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.name,
+  description: product.short_description,
+  image: product.images.map((i) => productImage(i, 1000)),
+  sku: product.id,
+  brand: { '@type': 'Brand', name: Astro.locals.brand.name },
+  category: product.category_name,
+  offers: {
+    '@type': 'Offer',
+    url: `${env.siteUrl}/produto/${product.slug}`,
+    priceCurrency: 'BRL',
+    price: (product.price_cents / 100).toFixed(2),
+    availability: soldOut
+      ? 'https://schema.org/OutOfStock'
+      : 'https://schema.org/InStock',
+    itemCondition: 'https://schema.org/NewCondition',
+  },
+};
+if (product.rating && product.reviews_count > 0) {
+  productJsonLd.aggregateRating = {
+    '@type': 'AggregateRating',
+    ratingValue: product.rating,
+    reviewCount: product.reviews_count,
+    bestRating: 5,
+  };
+}
+
+const crumbs = [
+  { name: 'Início', href: env.siteUrl },
+  { name: 'Loja', href: `${env.siteUrl}/loja` },
+  ...product.category_path.map((c) => ({ name: c.name, href: `${env.siteUrl}/loja?categoria=${c.slug}` })),
+];
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    ...crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.href })),
+    { '@type': 'ListItem', position: crumbs.length + 1, name: product.name },
+  ],
+};
+---
+
+<BaseLayout
+  title={product.name}
+  description={product.short_description}
+  image={firstImage(product.images, 1200)}
+  type="product"
+>
+  <StructuredData slot="head" data={[productJsonLd, breadcrumbJsonLd]} />
+
+  <section class="container-x pb-16 pt-8 md:pt-12">
+    <nav class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted" aria-label="Trilha">
+      <a href="/" class="hover:text-ink">Início</a><span class="mx-2">/</span>
+      <a href="/loja" class="hover:text-ink">Loja</a>
+      {product.category_path.map((c) => (
+        <><span class="mx-2">/</span><a href={`/loja?categoria=${c.slug}`} class="hover:text-ink">{c.name}</a></>
+      ))}
+    </nav>
+
+    <div class="mt-6 grid gap-10 lg:grid-cols-2 lg:gap-16">
+      <div>
+        <ProductGallery client:load images={product.images} name={product.name} />
+      </div>
+
+      <div class="lg:pt-4">
+        <p class="eyebrow">{product.category_name}</p>
+        <h1 class="mt-3 font-display text-3xl sm:text-4xl">{product.name}</h1>
+
+        {product.rating && (
+          <div class="mt-3"><Rating value={product.rating} count={product.reviews_count} /></div>
+        )}
+
+        <p class="mt-5 max-w-md font-sans text-[15px] leading-relaxed text-ink-soft">
+          {product.short_description}
+        </p>
+
+        <div class="mt-6">
+          <PriceDisplay
+            priceCents={product.price_cents}
+            compareAtCents={product.compare_at_price_cents}
+            showInstallments
+            size="lg"
+          />
+        </div>
+
+        {lowStock && (
+          <p class="mt-3 font-sans text-[13px] text-agua-dark">Últimas {product.stock} unidades</p>
+        )}
+
+        <div class="mt-7 flex items-start gap-3">
+          <div class="flex-1"><AddToCartButton client:load product={cartLine} withQuantity /></div>
+          <FavoriteButton client:load slug={product.slug} />
+        </div>
+
+        <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-2 font-sans text-[12px] text-ink-muted">
+          <li>Frete grátis acima de {(env.shippingFreeThresholdCents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</li>
+          <li>Pix ou cartão em até 6x</li>
+          <li>Troca em até 7 dias</li>
+        </ul>
+
+        <div class="mt-10 divide-y divide-ink/10 border-y border-ink/10" data-accordion>
+          {sections.map((section, i) => (
+            <details class="group py-4" name="ficha-produto" open={i === 0}>
+              <summary class="flex cursor-pointer list-none items-center justify-between font-sans text-[14px] font-medium uppercase tracking-[0.1em] text-ink">
+                {section.title}
+                <span class="text-ink-muted transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <p class="mt-3 whitespace-pre-line font-sans text-[14px] leading-relaxed text-ink-soft">
+                {section.body}
+              </p>
+            </details>
+          ))}
+        </div>
+        <script is:inline>
+          // Accordion de fato: abrir um fecha os outros (fallback p/ navegadores
+          // sem suporte a <details name>).
+          (function () {
+            var group = document.querySelector('[data-accordion]');
+            if (!group) return;
+            var items = group.querySelectorAll('details');
+            items.forEach(function (d) {
+              d.addEventListener('toggle', function () {
+                if (!d.open) return;
+                items.forEach(function (o) {
+                  if (o !== d) o.open = false;
+                });
+              });
+            });
+          })();
+        </script>
+      </div>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <>
+      <WaveDivider class="text-agua-wash" color="#E3ECE9" />
+      <section class="bg-agua-wash py-16 md:py-20">
+        <div class="container-x">
+          <h2 class="font-display text-2xl sm:text-3xl">Combina com</h2>
+          <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4">
+            {related.map((p) => <ProductCard product={p} />)}
+          </div>
+        </div>
+      </section>
+    </>
+  )}
+</BaseLayout>

@@ -1,0 +1,53 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+export const prerender = false;
+
+const email = Astro.locals.site.contact.data.email;
+const brandName = Astro.locals.brand.name;
+---
+
+<LegalLayout
+  title="Política de Trocas e Devoluções"
+  description={`Como solicitar troca, devolução ou reembolso de produtos comprados na ${brandName}, conforme o Código de Defesa do Consumidor.`}
+  updated="29 de agosto de 2026"
+>
+  <h2>1. Direito de arrependimento</h2>
+  <p>
+    Conforme o art. 49 do Código de Defesa do Consumidor, você pode desistir da compra em até
+    <strong>7 (sete) dias corridos</strong> a partir do recebimento do produto, sem necessidade
+    de justificativa. Nesse caso, devolvemos o valor integral pago, incluindo o frete.
+  </p>
+
+  <h2>2. Troca por defeito</h2>
+  <p>
+    Produtos com defeito de fabricação, avaria no transporte ou divergência em relação ao pedido
+    podem ser trocados em até <strong>30 dias</strong> (produtos não duráveis) a partir do
+    recebimento. Entre em contato com fotos do item e da embalagem.
+  </p>
+
+  <h2>3. Produtos que não aceitamos de volta</h2>
+  <ul>
+    <li>Itens abertos ou com lacre rompido, salvo em caso de defeito;</li>
+    <li>Produtos com sinais de uso além da simples avaliação;</li>
+    <li>Itens sem a embalagem original ou nota fiscal.</li>
+  </ul>
+
+  <h2>4. Como solicitar</h2>
+  <ul>
+    <li>Envie um e-mail para <a href={`mailto:${email}`}>{email}</a> ou mensagem no WhatsApp;</li>
+    <li>Informe o número do pedido e o motivo;</li>
+    <li>Aguarde o código de postagem reversa (custeado por nós em caso de defeito ou arrependimento).</li>
+  </ul>
+
+  <h2>5. Prazos de reembolso</h2>
+  <p>
+    Após recebermos e conferirmos o produto, o estorno é feito em até 10 dias úteis. Para pagamentos
+    via Pix, o valor é devolvido na conta de origem; para cartão de crédito, o estorno aparece em
+    até duas faturas, conforme o prazo da operadora.
+  </p>
+
+  <p>
+    Este documento é um modelo e deve ser revisado por um profissional jurídico antes da operação
+    comercial real.
+  </p>
+</LegalLayout>

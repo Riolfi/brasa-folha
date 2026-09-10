@@ -1,0 +1,639 @@
+-- =============================================================================
+-- Iarah — TODAS as migrations (0001 → 0009) num arquivo só.
+-- Cole no SQL Editor do Supabase e rode uma vez, num projeto novo/vazio.
+-- Depois: `supabase/seed.sql` OU `npm run seed` (com PROFILE se for um perfil).
+-- Gerado de supabase/migrations/. Ordem importa.
+-- =============================================================================
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0001_init.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- =============================================================================
+-- Iarah — schema inicial
+-- Rode no SQL Editor do Supabase (ou via `supabase db push`).
+-- =============================================================================
+
+create extension if not exists "pgcrypto";
+
+-- ----------------------------------------------------------------------------
+-- Tabelas
+-- ----------------------------------------------------------------------------
+
+create table if not exists public.categories (
+  id           uuid primary key default gen_random_uuid(),
+  slug         text not null unique,
+  name         text not null,
+  description  text not null default '',
+  position     int  not null default 0,
+  created_at   timestamptz not null default now()
+);
+
+create table if not exists public.products (
+  id                     uuid primary key default gen_random_uuid(),
+  slug                   text not null unique,
+  name                   text not null,
+  category_id            uuid not null references public.categories(id) on delete restrict,
+  short_description      text not null default '',
+  description            text not null default '',
+  ingredients            text not null default '',
+  how_to_use             text not null default '',
+  price_cents            int  not null check (price_cents >= 0),
+  compare_at_price_cents int  check (compare_at_price_cents is null or compare_at_price_cents >= 0),
+  stock                  int  not null default 0 check (stock >= 0),
+  is_active              boolean not null default true,
+  is_bestseller          boolean not null default false,
+  rating                 numeric(2,1) check (rating is null or (rating >= 0 and rating <= 5)),
+  reviews_count          int not null default 0,
+  images                 jsonb not null default '[]'::jsonb,
+  created_at             timestamptz not null default now(),
+  updated_at             timestamptz not null default now()
+);
+
+create index if not exists products_category_idx on public.products(category_id);
+create index if not exists products_active_idx   on public.products(is_active);
+
+create table if not exists public.orders (
+  id                uuid primary key default gen_random_uuid(),
+  order_number      text not null unique,
+  status            text not null default 'pending'
+                      check (status in ('pending','paid','failed','cancelled')),
+  customer_name     text not null,
+  customer_email    text not null,
+  customer_phone    text not null default '',
+  customer_cpf      text not null default '',
+  shipping_cep      text not null default '',
+  shipping_address  jsonb not null default '{}'::jsonb,
+  shipping_cents    int not null default 0 check (shipping_cents >= 0),
+  subtotal_cents    int not null check (subtotal_cents >= 0),
+  total_cents       int not null check (total_cents >= 0),
+  payment_method    text,
+  mp_payment_id     text,
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now()
+);
+
+create index if not exists orders_status_idx  on public.orders(status);
+create index if not exists orders_created_idx on public.orders(created_at desc);
+
+create table if not exists public.order_items (
+  id               uuid primary key default gen_random_uuid(),
+  order_id         uuid not null references public.orders(id) on delete cascade,
+  product_id       uuid not null references public.products(id) on delete restrict,
+  product_name     text not null,
+  product_slug     text,
+  unit_price_cents int not null check (unit_price_cents >= 0),
+  quantity         int not null check (quantity > 0)
+);
+
+create index if not exists order_items_order_idx on public.order_items(order_id);
+
+-- ----------------------------------------------------------------------------
+-- updated_at automático
+-- ----------------------------------------------------------------------------
+
+create or replace function public.touch_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists products_touch on public.products;
+create trigger products_touch before update on public.products
+  for each row execute function public.touch_updated_at();
+
+drop trigger if exists orders_touch on public.orders;
+create trigger orders_touch before update on public.orders
+  for each row execute function public.touch_updated_at();
+
+-- ----------------------------------------------------------------------------
+-- RPC: confirmar pagamento + decrementar estoque (atômico e idempotente)
+-- Executa com privilégios do dono (security definer) e é chamada só pelo
+-- backend com a service-role key.
+-- ----------------------------------------------------------------------------
+
+create or replace function public.confirm_order_payment(
+  p_order_number text,
+  p_payment_id   text,
+  p_method       text
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order   public.orders%rowtype;
+  v_item    record;
+  v_updated int;
+begin
+  select * into v_order from public.orders
+    where order_number = p_order_number
+    for update;
+
+  if not found then
+    return 'not_found';
+  end if;
+
+  -- idempotência: se já está pago, não faz nada
+  if v_order.status = 'paid' then
+    return 'already_paid';
+  end if;
+
+  for v_item in
+    select product_id, quantity from public.order_items where order_id = v_order.id
+  loop
+    update public.products
+      set stock = stock - v_item.quantity
+      where id = v_item.product_id and stock >= v_item.quantity;
+    get diagnostics v_updated = row_count;
+    if v_updated = 0 then
+      raise exception 'Estoque insuficiente para o produto % no pedido %',
+        v_item.product_id, p_order_number;
+    end if;
+  end loop;
+
+  update public.orders
+    set status = 'paid',
+        payment_method = p_method,
+        mp_payment_id = coalesce(p_payment_id, mp_payment_id)
+    where id = v_order.id;
+
+  return 'confirmed';
+end;
+$$;
+
+-- ----------------------------------------------------------------------------
+-- Row Level Security
+-- ----------------------------------------------------------------------------
+
+alter table public.categories  enable row level security;
+alter table public.products    enable row level security;
+alter table public.orders      enable row level security;
+alter table public.order_items enable row level security;
+
+-- Catálogo: leitura pública
+drop policy if exists "categories readable" on public.categories;
+create policy "categories readable" on public.categories
+  for select using (true);
+
+drop policy if exists "active products readable" on public.products;
+create policy "active products readable" on public.products
+  for select using (is_active = true);
+
+-- orders / order_items: nenhuma política para anon/authenticated =>
+-- acesso somente via service-role key (que ignora RLS) no backend.
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0002_accounts.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- =============================================================================
+-- Iarah — contas de cliente (Supabase Auth)
+-- Rode DEPOIS de 0001_init.sql. Habilite os providers Email e Google no painel:
+-- Authentication > Providers.
+-- =============================================================================
+
+-- ----------------------------------------------------------------------------
+-- profiles — dados do cliente (1:1 com auth.users)
+-- ----------------------------------------------------------------------------
+create table if not exists public.profiles (
+  id         uuid primary key references auth.users(id) on delete cascade,
+  full_name  text not null default '',
+  phone      text not null default '',
+  cpf        text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+drop trigger if exists profiles_touch on public.profiles;
+create trigger profiles_touch before update on public.profiles
+  for each row execute function public.touch_updated_at();
+
+-- cria o profile automaticamente quando um usuário se cadastra
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.profiles (id, full_name)
+  values (new.id, coalesce(new.raw_user_meta_data ->> 'full_name', ''))
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+alter table public.profiles enable row level security;
+
+drop policy if exists "own profile - select" on public.profiles;
+create policy "own profile - select" on public.profiles
+  for select using (auth.uid() = id);
+
+drop policy if exists "own profile - insert" on public.profiles;
+create policy "own profile - insert" on public.profiles
+  for insert with check (auth.uid() = id);
+
+drop policy if exists "own profile - update" on public.profiles;
+create policy "own profile - update" on public.profiles
+  for update using (auth.uid() = id) with check (auth.uid() = id);
+
+-- ----------------------------------------------------------------------------
+-- addresses — endereços salvos
+-- ----------------------------------------------------------------------------
+create table if not exists public.addresses (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  label       text not null default 'Endereço',
+  cep         text not null,
+  street      text not null,
+  number      text not null,
+  complement  text not null default '',
+  district    text not null default '',
+  city        text not null,
+  state       text not null,
+  is_default  boolean not null default false,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists addresses_user_idx on public.addresses(user_id);
+
+alter table public.addresses enable row level security;
+
+drop policy if exists "own addresses" on public.addresses;
+create policy "own addresses" on public.addresses
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ----------------------------------------------------------------------------
+-- orders.user_id — vincula pedidos à conta (null = pedido de convidado)
+-- ----------------------------------------------------------------------------
+alter table public.orders
+  add column if not exists user_id uuid references auth.users(id) on delete set null;
+
+create index if not exists orders_user_idx on public.orders(user_id);
+
+-- cliente logado enxerga os próprios pedidos (escrita continua só via service-role)
+drop policy if exists "own orders - select" on public.orders;
+create policy "own orders - select" on public.orders
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "own order items - select" on public.order_items;
+create policy "own order items - select" on public.order_items
+  for select using (
+    exists (
+      select 1 from public.orders o
+      where o.id = order_items.order_id and o.user_id = auth.uid()
+    )
+  );
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0003_order_status.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- =============================================================================
+-- Iarah — status de envio do pedido + código de rastreio
+-- Rode DEPOIS de 0002_accounts.sql.
+-- =============================================================================
+
+alter table public.orders
+  add column if not exists tracking_code text;
+
+alter table public.orders
+  drop constraint if exists orders_status_check;
+
+alter table public.orders
+  add constraint orders_status_check
+  check (status in ('pending','paid','failed','cancelled','shipped','delivered'));
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0004_quiz.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- =============================================================================
+-- Iarah — quiz de pele / rotina personalizada
+-- Rode DEPOIS de 0003_order_status.sql. Depois rode `npm run seed` (ou
+-- supabase/seed.sql) para popular products.attributes.
+-- =============================================================================
+
+-- perfil de cada produto para o motor de recomendação
+alter table public.products
+  add column if not exists attributes jsonb not null default '{}'::jsonb;
+
+-- resultados de quiz (salvos por token; user_id opcional)
+create table if not exists public.skin_quizzes (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid references auth.users(id) on delete cascade,
+  token      text not null unique,
+  answers    jsonb not null,
+  result     jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists skin_quizzes_user_idx  on public.skin_quizzes(user_id);
+create index if not exists skin_quizzes_token_idx on public.skin_quizzes(token);
+
+alter table public.skin_quizzes enable row level security;
+
+-- o cliente logado enxerga os próprios quizzes (usado pelo /conta).
+-- Inserção e leitura por token de convidado passam pelo backend (service-role).
+drop policy if exists "own quizzes - select" on public.skin_quizzes;
+create policy "own quizzes - select" on public.skin_quizzes
+  for select using (auth.uid() = user_id);
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0005_offers.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- =============================================================================
+-- Iarah — carrossel de ofertas da home
+-- Rode DEPOIS de 0004_quiz.sql. Depois `npm run seed` popula os slides padrão.
+-- =============================================================================
+
+create table if not exists public.offers (
+  id         uuid primary key default gen_random_uuid(),
+  position   int not null default 0,
+  is_active  boolean not null default true,
+  image_url  text not null default '',
+  eyebrow    text not null default '',
+  title      text not null default '',
+  subtitle   text not null default '',
+  cta_label  text not null default '',
+  cta_href   text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists offers_position_idx on public.offers(position);
+
+drop trigger if exists offers_touch on public.offers;
+create trigger offers_touch before update on public.offers
+  for each row execute function public.touch_updated_at();
+
+alter table public.offers enable row level security;
+
+drop policy if exists "active offers readable" on public.offers;
+create policy "active offers readable" on public.offers
+  for select using (is_active = true);
+-- escrita: somente via service-role (backend)
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0006_categories.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- =============================================================================
+-- Iarah — categorias em árvore de 2 níveis (categoria → subcategoria)
+-- Produto pertence sempre a uma subcategoria (nível 2), nunca a uma raiz.
+-- Rode DEPOIS de 0005_offers.sql. Depois `npm run seed`.
+-- =============================================================================
+
+alter table public.categories
+  add column if not exists image_url text not null default '';
+
+alter table public.categories
+  add column if not exists parent_id uuid references public.categories(id) on delete cascade;
+
+-- limpeza de colunas de versões anteriores nunca aplicadas
+alter table public.categories drop column if exists links;
+alter table public.categories drop column if exists subcategories;
+
+create index if not exists categories_parent_idx on public.categories(parent_id);
+
+-- ----------------------------------------------------------------------------
+-- Guard: a árvore tem no máximo 2 níveis
+-- ----------------------------------------------------------------------------
+create or replace function public.categories_depth_guard()
+returns trigger language plpgsql as $$
+begin
+  if new.parent_id is not null then
+    if new.parent_id = new.id then
+      raise exception 'Uma categoria não pode ser pai de si mesma';
+    end if;
+    if exists (select 1 from public.categories where id = new.parent_id and parent_id is not null) then
+      raise exception 'Só é permitido 2 níveis: a subcategoria não pode ter subcategorias';
+    end if;
+    if exists (select 1 from public.categories where parent_id = new.id) then
+      raise exception 'Esta categoria tem subcategorias — não pode virar subcategoria';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists categories_depth on public.categories;
+create trigger categories_depth before insert or update on public.categories
+  for each row execute function public.categories_depth_guard();
+
+-- ----------------------------------------------------------------------------
+-- Guard: produto só pode apontar para uma subcategoria (nível 2)
+-- ----------------------------------------------------------------------------
+create or replace function public.products_subcategory_guard()
+returns trigger language plpgsql as $$
+begin
+  if not exists (
+    select 1 from public.categories where id = new.category_id and parent_id is not null
+  ) then
+    raise exception 'O produto deve pertencer a uma subcategoria (categoria de nível 2)';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists products_subcategory on public.products;
+create trigger products_subcategory before insert or update on public.products
+  for each row execute function public.products_subcategory_guard();
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0007_site_content.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- =============================================================================
+-- Iarah — conteúdo editável do site (home CTA do quiz, "mais queridos", rodapé,
+-- páginas Sobre e Contato, dados de atendimento).
+-- Rode DEPOIS de 0006_categories.sql. Depois `npm run seed` popula os textos
+-- padrão (não sobrescreve edições existentes).
+-- =============================================================================
+
+create table if not exists public.site_content (
+  section    text primary key,
+  is_active  boolean not null default true,
+  data       jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+drop trigger if exists site_content_touch on public.site_content;
+create trigger site_content_touch before update on public.site_content
+  for each row execute function public.touch_updated_at();
+
+alter table public.site_content enable row level security;
+
+drop policy if exists "site_content readable" on public.site_content;
+create policy "site_content readable" on public.site_content
+  for select using (true);
+-- escrita: somente via service-role (backend)
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0008_barcode.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Código de barras (EAN/UPC) por produto — leitor no cadastro (Produtos) e,
+-- depois, no Caixa. Único quando presente; NULLs não conflitam entre si (a
+-- própria constraint unique já cria o índice de busca).
+alter table public.products add column if not exists barcode text;
+alter table public.products add constraint products_barcode_key unique (barcode);
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0009_caixa.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Caixa (PDV interno) — venda de balcão feita pela área administrativa.
+-- Reusa orders/order_items. NÃO é caixa fiscal: não emite NFC-e / cupom.
+-- 'source' separa a venda do site ('web') da venda no balcão ('caixa').
+
+alter table public.orders
+  add column if not exists source text not null default 'web';
+
+alter table public.orders
+  drop constraint if exists orders_source_check;
+alter table public.orders
+  add constraint orders_source_check check (source in ('web', 'caixa'));
+
+create index if not exists orders_source_idx on public.orders(source);
+
+-- ----------------------------------------------------------------------------
+-- RPC: registra uma venda de caixa (pedido já `paid`) e baixa o estoque, tudo
+-- numa transação. Preço e nome vêm do banco — o cliente só manda product_id e
+-- quantidade. Levanta exceção (rollback total) se faltar estoque.
+--   p_items: jsonb array de { "product_id": <uuid>, "quantity": <int> }
+-- Retorna o id do pedido criado.
+-- ----------------------------------------------------------------------------
+create or replace function public.caixa_checkout(
+  p_order_number text,
+  p_method       text,
+  p_items        jsonb
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order_id uuid;
+  v_line     record;
+  v_prod     public.products%rowtype;
+  v_subtotal int := 0;
+  v_updated  int;
+begin
+  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then
+    raise exception 'Venda sem itens.';
+  end if;
+
+  insert into public.orders (
+    order_number, status, source, customer_name, customer_email,
+    subtotal_cents, total_cents, payment_method
+  ) values (
+    p_order_number, 'paid', 'caixa', 'Consumidor', '',
+    0, 0, p_method
+  )
+  returning id into v_order_id;
+
+  for v_line in
+    select (e->>'product_id')::uuid                       as product_id,
+           greatest(1, coalesce((e->>'quantity')::int, 1)) as quantity
+    from jsonb_array_elements(p_items) e
+  loop
+    select * into v_prod from public.products
+      where id = v_line.product_id
+      for update;
+    if not found then
+      raise exception 'Produto não encontrado no catálogo.';
+    end if;
+
+    update public.products
+      set stock = stock - v_line.quantity
+      where id = v_line.product_id and stock >= v_line.quantity;
+    get diagnostics v_updated = row_count;
+    if v_updated = 0 then
+      raise exception 'Estoque insuficiente para "%".', v_prod.name;
+    end if;
+
+    insert into public.order_items (
+      order_id, product_id, product_name, product_slug, unit_price_cents, quantity
+    ) values (
+      v_order_id, v_prod.id, v_prod.name, v_prod.slug, v_prod.price_cents, v_line.quantity
+    );
+
+    v_subtotal := v_subtotal + v_prod.price_cents * v_line.quantity;
+  end loop;
+
+  update public.orders
+    set subtotal_cents = v_subtotal,
+        total_cents    = v_subtotal
+    where id = v_order_id;
+
+  return v_order_id;
+end;
+$$;
+
+-- ----------------------------------------------------------------------------
+-- RPC: cancela uma venda de caixa e DEVOLVE o estoque. Idempotente. Só age em
+-- pedidos source='caixa' que ainda não estejam 'cancelled'.
+-- ----------------------------------------------------------------------------
+create or replace function public.cancel_caixa_sale(
+  p_order_number text
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order public.orders%rowtype;
+  v_line  record;
+begin
+  select * into v_order from public.orders
+    where order_number = p_order_number
+    for update;
+
+  if not found then
+    return 'not_found';
+  end if;
+  if v_order.source <> 'caixa' then
+    return 'not_caixa';
+  end if;
+  if v_order.status = 'cancelled' then
+    return 'already_cancelled';
+  end if;
+
+  for v_line in
+    select product_id, quantity from public.order_items where order_id = v_order.id
+  loop
+    update public.products
+      set stock = stock + v_line.quantity
+      where id = v_line.product_id;
+  end loop;
+
+  update public.orders
+    set status = 'cancelled'
+    where id = v_order.id;
+
+  return 'cancelled';
+end;
+$$;
+

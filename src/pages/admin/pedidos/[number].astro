@@ -1,0 +1,121 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getOrderByNumber } from '../../../lib/repo/orders';
+import { brl, formatCpf, formatPhone } from '../../../lib/format';
+import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS, type OrderStatus } from '../../../lib/types';
+
+export const prerender = false;
+
+const { number } = Astro.params;
+const order = number ? await getOrderByNumber(number) : null;
+if (!order) return Astro.redirect('/admin/pedidos');
+
+const a = order.shipping_address;
+const saved = Astro.url.searchParams.get('ok') === '1';
+const updateError = Astro.url.searchParams.get('erro') === 'update';
+const statuses = Object.entries(ORDER_STATUS_LABELS) as [OrderStatus, string][];
+---
+
+<AdminLayout title={`Pedido ${order.order_number}`}>
+  <a href="/admin/pedidos" class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted hover:text-ink">← Pedidos</a>
+
+  {saved && (
+    <p class="mt-4 rounded-card border border-agua/40 bg-agua-wash px-3 py-2 text-sm text-agua-dark">
+      Status atualizado e e-mail enviado ao cliente.
+    </p>
+  )}
+  {updateError && (
+    <p class="mt-4 rounded-card border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800">
+      Não foi possível atualizar. Rode a migration <code>0003_order_status.sql</code> no Supabase
+      (adiciona os status "enviado"/"entregue" e o campo de rastreio).
+    </p>
+  )}
+
+  <div class="mt-4 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+    <section class="rounded-card border border-ink/10 bg-white p-5">
+      <div class="flex items-center justify-between">
+        <h2 class="font-display text-lg">Itens</h2>
+        <div class="flex items-center gap-2">
+          {order.source === 'caixa' && (
+            <span class="rounded-full bg-blush-light px-2 py-0.5 text-[11px] uppercase tracking-[0.1em] text-ink-soft">Venda no caixa</span>
+          )}
+          <span class="rounded-full bg-bone-200 px-2 py-0.5 text-[11px] uppercase">{ORDER_STATUS_LABELS[order.status]}</span>
+        </div>
+      </div>
+      <table class="mt-4 w-full text-left text-sm">
+        <tbody>
+          {order.items.map((i) => (
+            <tr class="border-t border-ink/10">
+              <td class="py-2">{i.product_name}</td>
+              <td class="py-2 text-ink-muted">× {i.quantity}</td>
+              <td class="py-2 text-right">{brl(i.unit_price_cents * i.quantity)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <dl class="mt-4 space-y-1 border-t border-ink/10 pt-3 text-sm">
+        <div class="flex justify-between text-ink-soft"><dt>Subtotal</dt><dd>{brl(order.subtotal_cents)}</dd></div>
+        <div class="flex justify-between text-ink-soft"><dt>Frete</dt><dd>{brl(order.shipping_cents)}</dd></div>
+        <div class="flex justify-between font-display text-lg"><dt>Total</dt><dd>{brl(order.total_cents)}</dd></div>
+        {order.payment_method && (
+          <div class="flex justify-between text-ink-soft"><dt>Pagamento</dt><dd>{PAYMENT_METHOD_LABELS[order.payment_method]}</dd></div>
+        )}
+      </dl>
+      {order.mp_payment_id && (
+        <p class="mt-3 font-sans text-[12px] text-ink-muted">Pagamento MP: {order.mp_payment_id} · método: {order.payment_method}</p>
+      )}
+    </section>
+
+    <section class="space-y-4">
+      <form
+        method="POST"
+        action="/api/admin/orders"
+        class="rounded-card border border-ink/10 bg-white p-5"
+      >
+        <h2 class="font-display text-lg">Atualizar status</h2>
+        <input type="hidden" name="order_number" value={order.order_number} />
+        <label class="label mt-3" for="status">Status do pedido</label>
+        <select id="status" name="status" class="field">
+          {statuses.map(([value, label]) => (
+            <option value={value} selected={value === order.status}>{label}</option>
+          ))}
+        </select>
+
+        <label class="label mt-3" for="tracking_code">Código de rastreio (para "Enviado")</label>
+        <input
+          id="tracking_code"
+          name="tracking_code"
+          class="field"
+          value={order.tracking_code ?? ''}
+          placeholder="ex.: AA123456789BR"
+        />
+
+        <label class="mt-3 flex items-center gap-2 text-sm text-ink-soft">
+          <input type="checkbox" name="notify" checked />
+          Enviar e-mail ao cliente
+        </label>
+
+        <button type="submit" class="btn-primary mt-4 w-full">Salvar e notificar</button>
+      </form>
+
+      <div class="rounded-card border border-ink/10 bg-white p-5 text-sm">
+        <h2 class="font-display text-lg">Cliente</h2>
+        <p class="mt-2 text-ink-soft">{order.customer_name}</p>
+        <p class="text-ink-soft">{order.customer_email}</p>
+        <p class="text-ink-soft">{formatPhone(order.customer_phone)}</p>
+        <p class="text-ink-soft">CPF {formatCpf(order.customer_cpf)}</p>
+      </div>
+      <div class="rounded-card border border-ink/10 bg-white p-5 text-sm">
+        <h2 class="font-display text-lg">Entrega</h2>
+        <p class="mt-2 text-ink-soft">
+          {a.street}, {a.number}{a.complement ? ` — ${a.complement}` : ''}<br />
+          {a.district} — {a.city}/{a.state}<br />
+          CEP {a.cep}
+        </p>
+      </div>
+      <p class="font-sans text-[12px] text-ink-muted">
+        Criado em {new Date(order.created_at).toLocaleString('pt-BR')}
+      </p>
+    </section>
+  </div>
+</AdminLayout>

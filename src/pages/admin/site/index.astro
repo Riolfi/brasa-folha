@@ -1,0 +1,45 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getSiteContent } from '../../../lib/repo/site';
+import type { SiteSectionKey } from '../../../lib/types';
+
+export const prerender = false;
+
+const site = await getSiteContent();
+
+const SECTIONS: { key: SiteSectionKey; label: string; hint: string; toggle: boolean }[] = [
+  { key: 'brand', label: 'Logotipo', hint: 'imagem do cabeçalho (ou o nome em texto se vazio)', toggle: false },
+  { key: 'home_quiz', label: 'Home — CTA do teste de pele', hint: '"Não sabe por onde começar?"', toggle: true },
+  { key: 'home_bestsellers', label: 'Home — Mais queridos', hint: '"Escolhas da casa"', toggle: true },
+  { key: 'home_story', label: 'Home — Narrativa da marca', hint: '"A história do nome" + selos', toggle: true },
+  { key: 'home_social', label: 'Home — Prova social', hint: 'título + depoimentos', toggle: true },
+  { key: 'page_sobre', label: 'Página "Sobre"', hint: 'história, valores e chamada final', toggle: false },
+  { key: 'page_contato', label: 'Página "Contato"', hint: 'textos e formulário', toggle: false },
+  { key: 'footer', label: 'Rodapé', hint: 'frase, trocas, linha jurídica e de pagamento', toggle: false },
+  { key: 'contact', label: 'Atendimento (e-mail / WhatsApp / horário)', hint: 'usado no rodapé, na página Contato e no botão flutuante', toggle: false },
+];
+---
+
+<AdminLayout title="Conteúdo">
+  <p class="font-sans text-sm text-ink-muted">
+    Textos das seções gerenciáveis da home e das páginas institucionais. Cada edição
+    vale para o site todo — sem mexer no código.
+  </p>
+
+  <ul class="mt-6 divide-y divide-ink/10 rounded-card border border-ink/10 bg-white">
+    {SECTIONS.map((s) => (
+      <li class="flex items-center gap-4 p-4">
+        <div class="min-w-0 flex-1">
+          <a href={`/admin/site/${s.key}`} class="font-medium text-agua-dark">{s.label}</a>
+          <p class="truncate text-[12px] text-ink-muted">{s.hint}</p>
+        </div>
+        {s.toggle && (
+          <span class:list={['rounded-full px-2 py-0.5 text-[11px] uppercase', site[s.key].is_active ? 'bg-agua-wash text-agua-dark' : 'bg-bone-200 text-ink-muted']}>
+            {site[s.key].is_active ? 'visível' : 'oculta'}
+          </span>
+        )}
+        <a href={`/admin/site/${s.key}`} class="font-sans text-[12px] uppercase tracking-[0.12em] text-agua-dark">Editar</a>
+      </li>
+    ))}
+  </ul>
+</AdminLayout>

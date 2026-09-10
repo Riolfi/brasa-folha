@@ -1,0 +1,15 @@
+---
+import AccountLayout from '../../layouts/AccountLayout.astro';
+import AddressBook from '../../components/AddressBook.tsx';
+import { listAddresses } from '../../lib/repo/account';
+
+export const prerender = false;
+
+const sb = Astro.locals.supabase!;
+const addresses = await listAddresses(sb);
+---
+
+<AccountLayout title="Endereços" active="enderecos">
+  <p class="prose-iarah mb-6">Salve endereços para escolher rapidamente no checkout.</p>
+  <AddressBook client:load addresses={addresses} />
+</AccountLayout>

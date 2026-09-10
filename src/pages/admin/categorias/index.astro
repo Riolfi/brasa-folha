@@ -1,0 +1,31 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import CategoryTree from '../../../components/CategoryTree.tsx';
+import { getCategoryTree, getProducts } from '../../../lib/repo/catalog';
+
+export const prerender = false;
+
+const [tree, products] = await Promise.all([getCategoryTree(), getProducts({ includeInactive: true })]);
+
+const countBySlug = new Map<string, number>();
+const imageBySlug = new Map<string, string>();
+for (const p of products) {
+  countBySlug.set(p.category_slug, (countBySlug.get(p.category_slug) ?? 0) + 1);
+  if (!imageBySlug.has(p.category_slug)) imageBySlug.set(p.category_slug, p.images[0] ?? '');
+}
+
+const toNode = (c: (typeof tree)[number] | (typeof tree)[number]['children'][number]): any => ({
+  id: c.id,
+  name: c.name,
+  slug: c.slug,
+  thumb: c.image_url || imageBySlug.get(c.slug) || '',
+  count: countBySlug.get(c.slug) ?? 0,
+  children: 'children' in c ? c.children.map(toNode) : [],
+});
+
+const nodes = tree.map(toNode);
+---
+
+<AdminLayout title="Categorias">
+  <CategoryTree client:load tree={nodes} />
+</AdminLayout>

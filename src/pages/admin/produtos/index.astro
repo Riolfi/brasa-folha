@@ -1,0 +1,97 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getProducts } from '../../../lib/repo/catalog';
+import { brl } from '../../../lib/format';
+
+export const prerender = false;
+
+const products = await getProducts({ includeInactive: true, sort: 'novidades' });
+---
+
+<AdminLayout title="Produtos">
+  <div class="flex items-center justify-between">
+    <p class="font-sans text-sm text-ink-muted">{products.length} produtos no catálogo</p>
+    <a href="/admin/produtos/novo" class="btn-primary">Novo produto</a>
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-end gap-3 rounded-card border border-ink/10 bg-white p-4">
+    <label class="block min-w-[240px] flex-1">
+      <span class="label">Ler código de barras</span>
+      <input
+        id="barcode-scan"
+        class="field"
+        inputmode="numeric"
+        placeholder="passe o leitor aqui, ou digite e aperte Enter"
+        autocomplete="off"
+      />
+    </label>
+    <p id="barcode-scan-status" class="pb-2.5 font-sans text-[13px] text-ink-muted" aria-live="polite"></p>
+  </div>
+  <p class="mt-1.5 font-sans text-[12px] text-ink-muted">
+    Achou o produto → abre pra editar. Não achou → abre um cadastro novo já com o código preenchido.
+  </p>
+
+  <div class="mt-6 overflow-x-auto rounded-card border border-ink/10 bg-white">
+    <table class="w-full text-left text-sm">
+      <thead class="border-b border-ink/10 text-[12px] uppercase tracking-[0.1em] text-ink-muted">
+        <tr>
+          <th class="p-3">Produto</th>
+          <th class="p-3">Categoria</th>
+          <th class="p-3 text-right">Preço</th>
+          <th class="p-3 text-right">Estoque</th>
+          <th class="p-3">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {products.map((p) => (
+          <tr class="border-t border-ink/10 hover:bg-bone-50">
+            <td class="p-3">
+              <a href={`/admin/produtos/${p.id}`} class="font-medium text-agua-dark">{p.name}</a>
+              <span class="block text-[12px] text-ink-muted">{p.slug}</span>
+            </td>
+            <td class="p-3 text-ink-soft">{p.category_name}</td>
+            <td class="p-3 text-right">{brl(p.price_cents)}</td>
+            <td class:list={['p-3 text-right', p.stock <= 5 && 'text-red-700']}>{p.stock}</td>
+            <td class="p-3">
+              <span class:list={['rounded-full px-2 py-0.5 text-[11px] uppercase', p.is_active ? 'bg-agua-wash text-agua-dark' : 'bg-bone-200 text-ink-muted']}>
+                {p.is_active ? 'ativo' : 'inativo'}
+              </span>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>
+
+<script>
+  const input = document.getElementById('barcode-scan') as HTMLInputElement | null;
+  const status = document.getElementById('barcode-scan-status');
+
+  input?.addEventListener('keydown', async (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const code = input.value.trim();
+    if (!code) return;
+
+    input.disabled = true;
+    if (status) status.textContent = 'Buscando…';
+    try {
+      const res = await fetch(`/api/admin/products/by-barcode?code=${encodeURIComponent(code)}`);
+      if (res.ok) {
+        const data = (await res.json()) as { id: string };
+        window.location.href = `/admin/produtos/${data.id}`;
+        return;
+      }
+      if (res.status === 404) {
+        window.location.href = `/admin/produtos/novo?barcode=${encodeURIComponent(code)}`;
+        return;
+      }
+      if (status) status.textContent = 'Erro ao buscar — tenta de novo.';
+    } catch {
+      if (status) status.textContent = 'Erro de conexão.';
+    } finally {
+      input.disabled = false;
+    }
+  });
+</script>
