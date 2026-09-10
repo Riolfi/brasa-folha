@@ -1,7 +1,7 @@
 -- =============================================================================
--- Iarah — TODAS as migrations (0001 → 0009) num arquivo só.
--- Cole no SQL Editor do Supabase e rode uma vez, num projeto novo/vazio.
--- Depois: `supabase/seed.sql` OU `npm run seed` (com PROFILE se for um perfil).
+-- Brasa & Folha — TODAS as migrations (0001 → 0009) num arquivo só.
+-- Cole no SQL Editor do Supabase. Reexecutável (idempotente).
+-- Depois: `npm run seed` popula catálogo, ofertas e textos.
 -- Gerado de supabase/migrations/. Ordem importa.
 -- =============================================================================
 
@@ -491,10 +491,11 @@ create policy "site_content readable" on public.site_content
 -- 0008_barcode.sql
 -- ─────────────────────────────────────────────────────────────────────────────
 
--- Código de barras (EAN/UPC) por produto — leitor no cadastro (Produtos) e,
--- depois, no Caixa. Único quando presente; NULLs não conflitam entre si (a
--- própria constraint unique já cria o índice de busca).
+-- Código de barras (EAN/UPC) por produto — leitor no cadastro (Produtos) e
+-- no Caixa. Único quando presente; NULLs não conflitam entre si (a própria
+-- constraint unique já cria o índice de busca).
 alter table public.products add column if not exists barcode text;
+alter table public.products drop constraint if exists products_barcode_key;
 alter table public.products add constraint products_barcode_key unique (barcode);
 
 
