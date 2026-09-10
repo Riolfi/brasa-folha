@@ -19,15 +19,14 @@ if (!url || !key) {
 }
 
 const dataDir = new URL('../src/data/', import.meta.url);
-const loadData = async <T = any>(name: string): Promise<T> =>
-  JSON.parse(await readFile(new URL(name, dataDir), 'utf-8')) as T;
+const loadData = async (name) => JSON.parse(await readFile(new URL(name, dataDir), 'utf-8'));
 
 const catalog = await loadData('catalog.json');
 const sb = createClient(url, key, { auth: { persistSession: false } });
 
 console.log(`→ ${catalog.categories.length} categorias, ${catalog.products.length} produtos`);
 
-const catRow = (c: any) => ({
+const catRow = (c) => ({
   id: c.id,
   slug: c.slug,
   name: c.name,
@@ -37,8 +36,8 @@ const catRow = (c: any) => ({
   parent_id: c.parent_id ?? null,
 });
 
-const newIds = new Set(catalog.categories.map((c: any) => c.id));
-const die = (label: string, e: { message: string }) => {
+const newIds = new Set(catalog.categories.map((c) => c.id));
+const die = (label, e) => {
   console.error(`✗ ${label}:`, e.message);
   process.exit(1);
 };
@@ -53,8 +52,8 @@ for (const c of legacy) {
 
 // 2. raízes primeiro (FK parent_id + trigger de profundidade), depois subcategorias
 for (const group of [
-  catalog.categories.filter((c: any) => !c.parent_id),
-  catalog.categories.filter((c: any) => c.parent_id),
+  catalog.categories.filter((c) => !c.parent_id),
+  catalog.categories.filter((c) => c.parent_id),
 ]) {
   if (!group.length) continue;
   const { error } = await sb.from('categories').upsert(group.map(catRow), { onConflict: 'id' });
@@ -62,10 +61,10 @@ for (const group of [
 }
 console.log('✓ categorias');
 
-const catBySlug = new Map(catalog.categories.map((c: any) => [c.slug, c.id]));
+const catBySlug = new Map(catalog.categories.map((c) => [c.slug, c.id]));
 
 const { error: prodErr } = await sb.from('products').upsert(
-  catalog.products.map((p: any) => ({
+  catalog.products.map((p) => ({
     id: p.id,
     slug: p.slug,
     name: p.name,
@@ -99,7 +98,7 @@ for (const c of leftovers ?? []) {
   const { error } = await sb.from('categories').delete().eq('id', c.id);
   if (error) console.warn(`… não removeu ${c.slug}:`, error.message);
 }
-if ((leftovers ?? []).length) console.log(`✓ ${leftovers!.length} categorias antigas removidas`);
+if ((leftovers ?? []).length) console.log(`✓ ${leftovers.length} categorias antigas removidas`);
 
 // ofertas padrão do carrossel (só se a tabela existir e estiver vazia)
 try {
@@ -112,15 +111,13 @@ try {
   } else {
     console.log('… ofertas já existem, mantidas');
   }
-} catch (e: any) {
+} catch (e) {
   console.warn('… ofertas puladas:', e.message);
 }
 
 // conteúdo editável do site (só insere o que ainda não existe — não sobrescreve)
 try {
-  const siteContent = await loadData<Record<string, { is_active: boolean; data: unknown }>>(
-    'site-content.default.json',
-  );
+  const siteContent = await loadData('site-content.default.json');
   const rows = Object.entries(siteContent).map(([section, v]) => ({
     section,
     is_active: v.is_active,
@@ -131,7 +128,7 @@ try {
     .upsert(rows, { onConflict: 'section', ignoreDuplicates: true });
   if (error) console.warn('… conteúdo do site:', error.message, '(rode a migration 0007_site_content.sql)');
   else console.log('✓ conteúdo do site (seções padrão)');
-} catch (e: any) {
+} catch (e) {
   console.warn('… conteúdo do site pulado:', e.message);
 }
 
