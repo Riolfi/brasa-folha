@@ -1,7 +1,6 @@
 -- =============================================================================
--- Brasa & Folha — TODAS as migrations (0001 → 0009) num arquivo só.
--- Cole no SQL Editor do Supabase. Reexecutável (idempotente).
--- Depois: `npm run seed` popula catálogo, ofertas e textos.
+-- Brasa & Folha — TODAS as migrations num arquivo só. Reexecutável (idempotente).
+-- Cole no SQL Editor do Supabase. Depois: `npm run seed`.
 -- Gerado de supabase/migrations/. Ordem importa.
 -- =============================================================================
 
@@ -637,4 +636,14 @@ begin
   return 'cancelled';
 end;
 $$;
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 0010_offer_mobile_image.sql
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Imagem separada para mobile no slide do carrossel (retrato). O app já lê
+-- `image_url_mobile` (OffersCarousel, repo/site.rowToOffer) e o form do admin
+-- salva; faltava a coluna.
+alter table public.offers add column if not exists image_url_mobile text not null default '';
 

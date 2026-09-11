@@ -32,8 +32,9 @@ Admin: `http://localhost:4321/admin` — senha em `ADMIN_PASSWORD` (padrão do `
    - `0008_barcode.sql` — coluna `products.barcode` (EAN/UPC, único) para o leitor
    - `0009_caixa.sql` — coluna `orders.source` + funções `caixa_checkout` /
      `cancel_caixa_sale` para o Caixa (PDV interno, venda de balcão)
-   Depois rode `supabase/seed.sql` **ou** `npm run seed` (popula catálogo, atributos,
-   categorias, ofertas e os textos padrão do site).
+   - `0010_offer_mobile_image.sql` — coluna `offers.image_url_mobile`
+   Depois rode `npm run seed` (popula catálogo, categorias, ofertas e os textos
+   padrão do site). É idempotente.
 3. Em **Project Settings → API**, copie para o `.env`:
    - `SUPABASE_URL` → "Project URL"
    - `PUBLIC_SUPABASE_ANON_KEY` → chave `anon` `public`
