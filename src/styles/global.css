@@ -507,17 +507,18 @@ section.bg-ink ul.reveal li {
 }
 
 /* — seção "categorias" (home): cabeçalho alinhado com os círculos e colado
-   na divisória de cima — */
-.tb-cat-sec {
+   na divisória de cima. Seletor "elemento + classe" pra ter especificidade
+   maior que os utilitários de padding do Tailwind (senão a ordem decide). */
+section.tb-cat-sec {
   padding-top: 1.75rem;
   padding-bottom: 2.75rem;
 }
-.tb-cat-head {
+.container-x.tb-cat-head {
   max-width: none;
   padding-inline: clamp(1.25rem, 4vw, 3.5rem);
 }
 @media (min-width: 768px) {
-  .tb-cat-sec {
+  section.tb-cat-sec {
     padding-top: 2.25rem;
     padding-bottom: 3.5rem;
   }
