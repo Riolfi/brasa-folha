@@ -102,7 +102,10 @@ if ((leftovers ?? []).length) console.log(`✓ ${leftovers.length} categorias an
 
 // ofertas padrão do carrossel (só se a tabela existir e estiver vazia)
 try {
-  const offers = await loadData('offers.default.json');
+  const rawOffers = await loadData('offers.default.json');
+  // upsert em lote usa a união das colunas de todos os objetos; slide sem a
+  // chave manda NULL explícito (em vez do default '' da coluna) — normaliza.
+  const offers = rawOffers.map((o) => ({ ...o, image_url_mobile: o.image_url_mobile ?? '' }));
   const { count } = await sb.from('offers').select('id', { count: 'exact', head: true });
   if ((count ?? 0) === 0) {
     const { error } = await sb.from('offers').upsert(offers, { onConflict: 'id' });
