@@ -190,6 +190,55 @@ export async function createCaixaSale(input: CaixaSaleInput): Promise<Order> {
   return order;
 }
 
+/**
+ * Cria um pedido de balcão `pending` (source='caixa', payment_method='pix')
+ * pra gerar uma cobrança Pix de verdade. Preço e nome saem do catálogo — o
+ * mesmo `priceCart` do checkout online, que já valida ativo/estoque.
+ *
+ * Diferente de `createCaixaSale`, aqui NÃO baixa estoque na criação: o
+ * pedido só vira `paid` (e o estoque só desce) quando o pagamento for
+ * confirmado, via o mesmo pipeline `confirmOrderPayment`/`fulfillPaidOrder`
+ * usado pelo checkout do site e pelo webhook do Mercado Pago.
+ */
+export async function createCaixaPixOrder(input: {
+  items: { product_id: string; quantity: number }[];
+}): Promise<Order> {
+  const sb = supabaseAdmin();
+  if (!hasSupabase || !sb) throw new Error('O Caixa exige o Supabase configurado.');
+
+  const { items, subtotalCents } = await priceCart(input.items);
+  const orderNumber = generateOrderNumber();
+
+  const { data: orderRow, error } = await sb
+    .from('orders')
+    .insert({
+      order_number: orderNumber,
+      status: 'pending',
+      source: 'caixa',
+      customer_name: 'Consumidor',
+      customer_email: '',
+      subtotal_cents: subtotalCents,
+      total_cents: subtotalCents,
+      payment_method: 'pix',
+    })
+    .select()
+    .single();
+  if (error) throw error;
+
+  const itemsPayload = items.map((i) => ({
+    order_id: orderRow.id,
+    product_id: i.product_id,
+    product_name: i.product_name,
+    product_slug: i.product_slug ?? null,
+    unit_price_cents: i.unit_price_cents,
+    quantity: i.quantity,
+  }));
+  const { error: itemsError } = await sb.from('order_items').insert(itemsPayload);
+  if (itemsError) throw itemsError;
+
+  return rowToOrder(orderRow, itemsPayload);
+}
+
 export type CancelCaixaOutcome = 'cancelled' | 'already_cancelled' | 'not_found' | 'not_caixa';
 
 /** Cancela uma venda de caixa e devolve o estoque (RPC `cancel_caixa_sale`). */

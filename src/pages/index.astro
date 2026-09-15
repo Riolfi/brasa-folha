@@ -42,14 +42,9 @@ const catImage = new Map<string, string>();
 for (const p of allProducts) {
   if (p.images[0] && !catImage.has(p.category_slug)) catImage.set(p.category_slug, p.images[0]);
 }
-const circleCats = tree.flatMap((root) => {
-  const rootImg =
-    catImage.get(root.slug) || root.children.map((c) => catImage.get(c.slug)).find(Boolean) || '';
-  return [
-    { slug: root.slug, name: root.name, image: rootImg },
-    ...root.children.map((c) => ({ slug: c.slug, name: c.name, image: catImage.get(c.slug) || '' })),
-  ];
-});
+const circleCats = tree.flatMap((root) =>
+  root.children.map((c) => ({ slug: c.slug, name: c.name, image: catImage.get(c.slug) || '' })),
+);
 
 const accordionRoots = tree.map((root) => ({
   id: root.id,

@@ -55,7 +55,14 @@ export default function OffersCarousel({ slides }: { slides: Offer[] }) {
           const media = (
             <picture>
               {s.image_url_mobile && (
-                <source media="(max-width: 767px)" srcset={s.image_url_mobile} />
+                // até 767px cobre celular; a condição de orientação estende
+                // pro iPad em retrato (768–1024px), que senão cairia na
+                // imagem desktop (bem mais larga) esticada num contêiner
+                // alto — cortando o texto que fica colado na lateral.
+                <source
+                  media="(max-width: 767px), (max-width: 1024px) and (orientation: portrait)"
+                  srcset={s.image_url_mobile}
+                />
               )}
               <img
                 src={imgSrc(s.image_url, 1920)}

@@ -508,13 +508,15 @@ section.bg-ink ul.reveal li {
 
 /* — seção "categorias" (home): cabeçalho alinhado com os círculos e colado
    na divisória de cima. Seletor "elemento + classe" pra ter especificidade
-   maior que os utilitários de padding do Tailwind (senão a ordem decide). */
+   maior que os utilitários de padding do Tailwind (senão a ordem decide).
+   Sem max-width:none aqui: o cabeçalho volta a usar o max-width padrão do
+   container-x (centralizado), acompanhando os círculos que agora também
+   ficam centralizados em vez de colados na borda. */
 section.tb-cat-sec {
   padding-top: 1.75rem;
   padding-bottom: 2.75rem;
 }
 .container-x.tb-cat-head {
-  max-width: none;
   padding-inline: clamp(1.25rem, 4vw, 3.5rem);
 }
 @media (min-width: 768px) {
@@ -534,6 +536,11 @@ section.tb-cat-sec {
      e rola na horizontal quando não cabe */
   padding: 0.5rem clamp(1.25rem, 4vw, 3.5rem) 1rem;
   scroll-snap-type: x proximity;
+  /* centraliza os círculos quando cabem na largura; "safe" faz o flexbox
+     cair pro alinhamento inicial quando eles não cabem, senão o scroll
+     ficaria travado sem acesso ao começo da lista */
+  justify-content: center;
+  justify-content: safe center;
 }
 .tb-cats::-webkit-scrollbar {
   display: none;

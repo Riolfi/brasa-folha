@@ -6,7 +6,7 @@
       "name": "Narguilé",
       "description": "Do vaso ao rosh — tudo para uma sessão redonda.",
       "position": 1,
-      "image_url": "/produtos/narguile-landscape.jpg",
+      "image_url": "/categorias/narguile.svg",
       "parent_id": null
     },
     {
@@ -15,7 +15,7 @@
       "name": "Para fumar",
       "description": "Sedas, dichavadores, isqueiros e cinzeiros.",
       "position": 2,
-      "image_url": "/produtos/teste2.jpg",
+      "image_url": "/categorias/para-fumar.svg",
       "parent_id": null
     },
     {
@@ -24,7 +24,7 @@
       "name": "Kits",
       "description": "Combos montados para começar sem erro.",
       "position": 3,
-      "image_url": "/produtos/teste.jpg",
+      "image_url": "/categorias/kits.svg",
       "parent_id": null
     },
     {

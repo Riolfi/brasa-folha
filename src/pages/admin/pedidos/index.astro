@@ -2,7 +2,7 @@
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { listOrders } from '../../../lib/repo/orders';
 import { brl } from '../../../lib/format';
-import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../../../lib/types';
+import { orderStatusLabel, PAYMENT_METHOD_LABELS } from '../../../lib/types';
 
 export const prerender = false;
 
@@ -55,7 +55,7 @@ const tabs = [
             <td class="p-3 text-ink-muted">{new Date(o.created_at).toLocaleDateString('pt-BR')}</td>
             <td class="p-3 text-ink-soft">{o.customer_name}<span class="block text-[12px] text-ink-muted">{o.customer_email}</span></td>
             <td class="p-3 text-ink-soft">{o.payment_method ? PAYMENT_METHOD_LABELS[o.payment_method] : '—'}</td>
-            <td class="p-3"><span class="rounded-full bg-bone-200 px-2 py-0.5 text-[11px] uppercase">{ORDER_STATUS_LABELS[o.status]}</span></td>
+            <td class="p-3"><span class="rounded-full bg-bone-200 px-2 py-0.5 text-[11px] uppercase">{orderStatusLabel(o.status, o.source)}</span></td>
             <td class="p-3 text-right">{brl(o.total_cents)}</td>
           </tr>
         ))}

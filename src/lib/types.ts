@@ -127,6 +127,11 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   shipped: 'Enviado',
   delivered: 'Entregue',
 };
+
+export function orderStatusLabel(status: OrderStatus, source: 'web' | 'caixa'): string {
+  return source === 'caixa' && status === 'paid' ? 'Concluída' : ORDER_STATUS_LABELS[status];
+}
+
 export type PaymentMethod = 'pix' | 'credit_card' | 'debit_card' | 'cash' | 'simulado';
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {

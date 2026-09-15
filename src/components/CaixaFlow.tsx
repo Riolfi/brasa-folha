@@ -27,6 +27,12 @@ interface Done {
   method: PaymentMethod;
 }
 
+interface PixWait {
+  order_number: string;
+  total_cents: number;
+  pix: { qrCode: string; qrCodeBase64: string; ticketUrl: string } | null;
+}
+
 const METHODS: PaymentMethod[] = ['cash', 'pix', 'debit_card', 'credit_card'];
 
 function parseReaisToCents(raw: string): number | null {
@@ -47,6 +53,7 @@ export default function CaixaFlow() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
   const [cancelled, setCancelled] = useState(false);
+  const [pixWait, setPixWait] = useState<PixWait | null>(null);
 
   const scanRef = useRef<HTMLInputElement>(null);
   const focusScanner = () => window.setTimeout(() => scanRef.current?.focus(), 0);
@@ -54,6 +61,34 @@ export default function CaixaFlow() {
   useEffect(() => {
     focusScanner();
   }, []);
+
+  // ---- Polling do Pix: enquanto aguarda, checa a cada 3s se já confirmou ----
+  useEffect(() => {
+    if (!pixWait) return;
+    const id = window.setInterval(async () => {
+      try {
+        const res = await fetch(`/api/payments/status?n=${pixWait.order_number}`);
+        const data = (await res.json().catch(() => ({}))) as { status?: string };
+        if (data.status === 'paid') {
+          window.clearInterval(id);
+          setDone({
+            order_number: pixWait.order_number,
+            total_cents: pixWait.total_cents,
+            received_cents: null,
+            method: 'pix',
+          });
+          setPixWait(null);
+        } else if (data.status === 'failed' || data.status === 'cancelled') {
+          window.clearInterval(id);
+          setError('O Pix não foi confirmado. Tente de novo.');
+          setPixWait(null);
+        }
+      } catch {
+        /* falha de rede num tick só: tenta de novo no próximo */
+      }
+    }, 3000);
+    return () => window.clearInterval(id);
+  }, [pixWait]);
 
   const total = useMemo(
     () => lines.reduce((s, l) => s + l.unit_price_cents * l.quantity, 0),
@@ -128,6 +163,7 @@ export default function CaixaFlow() {
     setError(null);
     setDone(null);
     setCancelled(false);
+    setPixWait(null);
     setMethod('cash');
     focusScanner();
   }
@@ -137,6 +173,44 @@ export default function CaixaFlow() {
     setBusy(true);
     setError(null);
     try {
+      if (method === 'pix') {
+        const res = await fetch('/api/admin/caixa', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            action: 'pix_charge',
+            items: lines.map((l) => ({ product_id: l.product_id, quantity: l.quantity })),
+          }),
+        });
+        const data = (await res.json().catch(() => ({}))) as {
+          error?: string;
+          status?: string;
+          order_number?: string;
+          total_cents?: number;
+          pix?: PixWait['pix'];
+        };
+        if (!res.ok || data.error || !data.order_number) {
+          setError(data.error || 'Não foi possível gerar o Pix.');
+          return;
+        }
+        if (data.status === 'approved') {
+          setDone({
+            order_number: data.order_number,
+            total_cents: data.total_cents ?? total,
+            received_cents: null,
+            method: 'pix',
+          });
+          return;
+        }
+        // pending: mostra o QR e espera a confirmação (polling acima)
+        setPixWait({
+          order_number: data.order_number,
+          total_cents: data.total_cents ?? total,
+          pix: data.pix ?? null,
+        });
+        return;
+      }
+
       const res = await fetch('/api/admin/caixa', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -160,6 +234,24 @@ export default function CaixaFlow() {
       setError('Sem conexão com o servidor.');
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function cancelPix() {
+    if (!pixWait || busy) return;
+    setBusy(true);
+    try {
+      await fetch('/api/admin/caixa', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel_pix', order_number: pixWait.order_number }),
+      });
+    } catch {
+      /* mesmo se a chamada falhar, deixa o operador tentar de novo */
+    } finally {
+      setPixWait(null);
+      setBusy(false);
+      focusScanner();
     }
   }
 
@@ -237,6 +329,56 @@ export default function CaixaFlow() {
             Ver em Pedidos
           </a>
         </div>
+      </div>
+    );
+  }
+
+  // ---- tela de espera do Pix -------------------------------------------------
+  if (pixWait) {
+    return (
+      <div class="mx-auto max-w-lg rounded-card border border-ink/10 bg-white p-8 text-center">
+        <p class="font-sans text-[13px] uppercase tracking-[0.14em] text-ink-muted">Aguardando o Pix</p>
+        <p class="mt-2 font-display text-3xl">{brl(pixWait.total_cents)}</p>
+        <p class="mt-1 font-sans text-[13px] text-ink-muted">Pedido {pixWait.order_number}</p>
+
+        {pixWait.pix?.qrCodeBase64 && (
+          <img
+            src={`data:image/png;base64,${pixWait.pix.qrCodeBase64}`}
+            alt="QR Code Pix"
+            width={220}
+            height={220}
+            class="mx-auto mt-4 rounded-card border border-ink/10"
+          />
+        )}
+        {pixWait.pix?.qrCode && (
+          <div class="mt-4 text-left">
+            <label class="label">Pix copia e cola</label>
+            <textarea readOnly class="field font-mono text-[12px]" rows={3}>
+              {pixWait.pix.qrCode}
+            </textarea>
+            <button
+              type="button"
+              class="btn-outline mt-2 w-full"
+              onClick={() => navigator.clipboard?.writeText(pixWait.pix!.qrCode)}
+            >
+              Copiar código
+            </button>
+          </div>
+        )}
+
+        <p class="mt-4 font-sans text-[13px] text-ink-muted">
+          Aguardando o cliente pagar… a confirmação é automática.
+        </p>
+        {error && <p class="mt-3 font-sans text-[13px] text-red-700">{error}</p>}
+
+        <button
+          type="button"
+          class="mt-6 font-sans text-[13px] text-red-700 underline disabled:opacity-50"
+          onClick={cancelPix}
+          disabled={busy}
+        >
+          Cancelar e escolher outra forma de pagamento
+        </button>
       </div>
     );
   }

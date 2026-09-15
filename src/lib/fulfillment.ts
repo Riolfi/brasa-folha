@@ -13,7 +13,9 @@ export async function fulfillPaidOrder(
 ) {
   const { order, outcome } = await confirmOrderPayment(orderNumber, opts);
 
-  if (outcome === 'confirmed' && order) {
+  // venda de balcão não tem e-mail de cliente (fica "Consumidor" / vazio) —
+  // não faz sentido tentar enviar confirmação
+  if (outcome === 'confirmed' && order && order.source !== 'caixa') {
     try {
       await sendOrderConfirmation(order);
     } catch (err) {

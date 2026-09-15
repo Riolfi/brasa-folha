@@ -10,8 +10,8 @@ export default function CartButton() {
       class="relative inline-flex items-center gap-2 font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark"
       aria-label={`Abrir carrinho, ${count} ${count === 1 ? 'item' : 'itens'}`}
     >
-      <span class="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink/20">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <span class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/20">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path
             d="M6 8h12l-1 12H7L6 8Zm3 0V6a3 3 0 0 1 6 0v2"
             stroke="currentColor"

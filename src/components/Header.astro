@@ -66,17 +66,17 @@ const brandName = Astro.locals.brand.name;
       <a href="/contato" class:list={['font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark', path === '/contato' && 'text-agua-dark']}>Contato</a>
     </nav>
 
-    <div class="flex items-center gap-3 sm:gap-4">
+    <div class="flex items-center gap-4 sm:gap-5">
       <FavoritesLink client:load />
       <CartButton client:load />
       {showAccount && <AccountMenu user={Astro.locals.user} />}
       <button
         type="button"
-        class="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink/20"
+        class="lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/20"
         aria-label="Abrir menu"
         data-menu-toggle
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
     </div>
   </div>

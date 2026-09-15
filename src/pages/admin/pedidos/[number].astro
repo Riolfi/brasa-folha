@@ -2,7 +2,7 @@
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { getOrderByNumber } from '../../../lib/repo/orders';
 import { brl, formatCpf, formatPhone } from '../../../lib/format';
-import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS, type OrderStatus } from '../../../lib/types';
+import { orderStatusLabel, PAYMENT_METHOD_LABELS, type OrderStatus } from '../../../lib/types';
 
 export const prerender = false;
 
@@ -13,7 +13,7 @@ if (!order) return Astro.redirect('/admin/pedidos');
 const a = order.shipping_address;
 const saved = Astro.url.searchParams.get('ok') === '1';
 const updateError = Astro.url.searchParams.get('erro') === 'update';
-const statuses = Object.entries(ORDER_STATUS_LABELS) as [OrderStatus, string][];
+const statuses = Object.entries({ pending: 'Aguardando pagamento', paid: 'Pago — em separação', failed: 'Pagamento não concluído', cancelled: 'Cancelado', shipped: 'Enviado', delivered: 'Entregue' }) as [OrderStatus, string][];
 ---
 
 <AdminLayout title={`Pedido ${order.order_number}`}>
@@ -39,7 +39,7 @@ const statuses = Object.entries(ORDER_STATUS_LABELS) as [OrderStatus, string][];
           {order.source === 'caixa' && (
             <span class="rounded-full bg-blush-light px-2 py-0.5 text-[11px] uppercase tracking-[0.1em] text-ink-soft">Venda no caixa</span>
           )}
-          <span class="rounded-full bg-bone-200 px-2 py-0.5 text-[11px] uppercase">{ORDER_STATUS_LABELS[order.status]}</span>
+          <span class="rounded-full bg-bone-200 px-2 py-0.5 text-[11px] uppercase">{orderStatusLabel(order.status, order.source)}</span>
         </div>
       </div>
       <table class="mt-4 w-full text-left text-sm">
@@ -67,6 +67,14 @@ const statuses = Object.entries(ORDER_STATUS_LABELS) as [OrderStatus, string][];
     </section>
 
     <section class="space-y-4">
+      {order.source === 'caixa' ? (
+        <div class="rounded-card border border-ink/10 bg-white p-5">
+          <h2 class="font-display text-lg">Venda presencial</h2>
+          <p class="mt-2 text-sm text-ink-soft">
+            Venda concluída e paga no caixa. Não há separação, envio ou código de rastreio para este pedido.
+          </p>
+        </div>
+      ) : (
       <form
         method="POST"
         action="/api/admin/orders"
@@ -97,6 +105,7 @@ const statuses = Object.entries(ORDER_STATUS_LABELS) as [OrderStatus, string][];
 
         <button type="submit" class="btn-primary mt-4 w-full">Salvar e notificar</button>
       </form>
+      )}
 
       <div class="rounded-card border border-ink/10 bg-white p-5 text-sm">
         <h2 class="font-display text-lg">Cliente</h2>
