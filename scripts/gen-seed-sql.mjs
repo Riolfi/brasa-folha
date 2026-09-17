@@ -13,7 +13,7 @@ const catBySlug = new Map(catalog.categories.map((c) => [c.slug, c.id]));
 const newIds = catalog.categories.map((c) => q(c.id)).join(', ');
 
 let out = `-- =============================================================================
--- Iarah — seed do catálogo (gerado de src/data/catalog.json)
+-- Brasa & Folha — seed do catálogo (gerado de src/data/catalog.json)
 -- Rode DEPOIS de 0001..0006. Idempotente. Migra bancos já populados:
 -- renomeia categorias antigas, insere a nova árvore, remapeia produtos e
 -- depois apaga as antigas.
