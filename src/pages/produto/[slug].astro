@@ -36,8 +36,8 @@ const cartLine = {
 
 const sections = [
   { title: 'Descrição', body: product.description },
-  { title: 'Ingredientes', body: product.ingredients },
-  { title: 'Modo de uso', body: product.how_to_use },
+  { title: 'Material', body: product.ingredients },
+  { title: 'Cuidados', body: product.how_to_use },
 ].filter((s) => s.body?.trim());
 
 const productJsonLd: Record<string, unknown> = {

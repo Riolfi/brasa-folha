@@ -2,7 +2,6 @@
 import AccountLayout from '../../layouts/AccountLayout.astro';
 import { listOrdersByUser } from '../../lib/repo/orders';
 import { getProfile } from '../../lib/repo/account';
-import { getLatestQuizForUser } from '../../lib/repo/quiz';
 import { brl } from '../../lib/format';
 import { ORDER_STATUS_LABELS } from '../../lib/types';
 
@@ -10,10 +9,9 @@ export const prerender = false;
 
 const user = Astro.locals.user!;
 const sb = Astro.locals.supabase!;
-const [orders, profile, quiz] = await Promise.all([
+const [orders, profile] = await Promise.all([
   listOrdersByUser(user.id, 5),
   getProfile(sb, user.id),
-  getLatestQuizForUser(user.id),
 ]);
 const firstName = (profile.full_name || user.email || '').split(/\s+/)[0];
 ---
@@ -32,26 +30,6 @@ const firstName = (profile.full_name || user.email || '').split(/\s+/)[0];
       <p class="font-sans text-sm text-ink">Endereços</p>
       <p class="mt-1 font-sans text-[13px] text-ink-muted">gerenciar entregas</p>
     </a>
-  </div>
-
-  <div class="mt-8 rounded-card border border-ink/10 bg-agua-wash/50 p-6">
-    <h2 class="font-display text-lg">Minha rotina</h2>
-    {quiz ? (
-      <>
-        <p class="mt-1 font-sans text-[14px] text-ink-soft">{quiz.result.summary}</p>
-        <div class="mt-3 flex gap-4 font-sans text-[13px]">
-          <a href={`/rotina/${quiz.token}`} class="link-underline text-ink">Ver rotina completa</a>
-          <a href="/rotina" class="link-underline text-ink-muted">Refazer o teste</a>
-        </div>
-      </>
-    ) : (
-      <>
-        <p class="mt-1 font-sans text-[14px] text-ink-soft">
-          Faça o teste de pele para receber uma rotina personalizada.
-        </p>
-        <a href="/rotina" class="btn-outline mt-3">Fazer o teste</a>
-      </>
-    )}
   </div>
 
   <h2 class="mt-10 font-display text-xl">Pedidos recentes</h2>

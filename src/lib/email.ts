@@ -185,7 +185,7 @@ export async function sendContactMessage(msg: {
     <p><strong>Mensagem:</strong></p>
     <p>${escapeHtml(msg.message).replace(/\n/g, '<br>')}</p>`;
 
-  const to = env.resendFrom.match(/<(.+)>/)?.[1] || 'ola@brasaefolha.com.br';
+  const to = env.resendFrom.match(/<(.+)>/)?.[1] || 'ola@lojarole.com.br';
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   if (hasResend) {
     try {

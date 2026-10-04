@@ -9,7 +9,6 @@ const site = await getSiteContent();
 
 const SECTIONS: { key: SiteSectionKey; label: string; hint: string; toggle: boolean }[] = [
   { key: 'brand', label: 'Logotipo', hint: 'imagem do cabeçalho (ou o nome em texto se vazio)', toggle: false },
-  { key: 'home_quiz', label: 'Home — CTA do teste de pele', hint: '"Não sabe por onde começar?"', toggle: true },
   { key: 'home_bestsellers', label: 'Home — Mais queridos', hint: '"Escolhas da casa"', toggle: true },
   { key: 'home_story', label: 'Home — Narrativa da marca', hint: '"A história do nome" + selos', toggle: true },
   { key: 'home_social', label: 'Home — Prova social', hint: 'título + depoimentos', toggle: true },

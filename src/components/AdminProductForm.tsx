@@ -1,11 +1,5 @@
 import { useState } from 'preact/hooks';
-import type { CategoryNode, Concern, Product, ProductAttributes, SkinType } from '../lib/types';
-import {
-  CONCERN_LABELS,
-  EMPTY_ATTRIBUTES,
-  ROUTINE_STEP_LABELS,
-  SKIN_TYPE_LABELS,
-} from '../lib/types';
+import type { CategoryNode, Product } from '../lib/types';
 
 interface Props {
   product: Product | null;
@@ -15,10 +9,6 @@ interface Props {
   initialBarcode?: string;
 }
 
-const SKIN_TYPES = Object.keys(SKIN_TYPE_LABELS) as SkinType[];
-const CONCERNS = Object.keys(CONCERN_LABELS) as Concern[];
-const STEPS = Object.keys(ROUTINE_STEP_LABELS) as (keyof typeof ROUTINE_STEP_LABELS)[];
-
 export default function AdminProductForm({ product, tree, initialBarcode }: Props) {
   const firstSub = tree.flatMap((r) => r.children)[0]?.id ?? '';
   const [saving, setSaving] = useState(false);
@@ -26,15 +16,6 @@ export default function AdminProductForm({ product, tree, initialBarcode }: Prop
   const [error, setError] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>(product?.images ?? []);
   const [urlInput, setUrlInput] = useState('');
-  const [attr, setAttr] = useState<ProductAttributes>(product?.attributes ?? EMPTY_ATTRIBUTES);
-
-  function toggleAttrArray<K extends 'skin_types' | 'concerns'>(key: K, value: string) {
-    setAttr((a) => {
-      const arr = a[key] as string[];
-      const next = arr.includes(value) ? arr.filter((x) => x !== value) : [...arr, value];
-      return { ...a, [key]: next };
-    });
-  }
   const [form, setForm] = useState({
     name: product?.name ?? '',
     slug: product?.slug ?? '',
@@ -122,7 +103,6 @@ export default function AdminProductForm({ product, tree, initialBarcode }: Prop
           is_active: form.is_active,
           is_bestseller: form.is_bestseller,
           images,
-          attributes: attr,
         }),
       });
       const data = await res.json();
@@ -209,11 +189,11 @@ export default function AdminProductForm({ product, tree, initialBarcode }: Prop
         <textarea class="field" rows={4} value={form.description} onInput={(e) => upd('description', (e.target as HTMLTextAreaElement).value)} />
       </label>
       <label class="block">
-        <span class="label">Ingredientes</span>
+        <span class="label">Material</span>
         <textarea class="field" rows={3} value={form.ingredients} onInput={(e) => upd('ingredients', (e.target as HTMLTextAreaElement).value)} />
       </label>
       <label class="block">
-        <span class="label">Modo de uso</span>
+        <span class="label">Cuidados</span>
         <textarea class="field" rows={3} value={form.how_to_use} onInput={(e) => upd('how_to_use', (e.target as HTMLTextAreaElement).value)} />
       </label>
       <div>
@@ -260,92 +240,6 @@ export default function AdminProductForm({ product, tree, initialBarcode }: Prop
           <button type="button" class="btn-outline shrink-0 text-[13px]" onClick={addUrl}>Adicionar</button>
         </div>
       </div>
-
-      <fieldset class="rounded-card border border-ink/10 bg-bone-50 p-5">
-        <legend class="px-1 font-display text-lg">Perfil para o quiz de pele</legend>
-        <p class="mb-3 text-[12px] text-ink-muted">
-          Usado pelo motor de recomendação em <code>/rotina</code>. Deixe em branco para
-          o produto não aparecer nas rotinas.
-        </p>
-
-        <div class="grid gap-4 sm:grid-cols-3">
-          <label class="block">
-            <span class="label">Passo da rotina</span>
-            <select
-              class="field"
-              value={attr.routine_step ?? ''}
-              onChange={(e) => setAttr((a) => ({ ...a, routine_step: ((e.target as HTMLSelectElement).value || null) as ProductAttributes['routine_step'] }))}
-            >
-              <option value="">— não recomendar —</option>
-              {STEPS.map((s) => <option value={s}>{ROUTINE_STEP_LABELS[s]}</option>)}
-            </select>
-          </label>
-          <label class="block">
-            <span class="label">Horário</span>
-            <select
-              class="field"
-              value={attr.time_of_day ?? ''}
-              onChange={(e) => setAttr((a) => ({ ...a, time_of_day: ((e.target as HTMLSelectElement).value || null) as ProductAttributes['time_of_day'] }))}
-            >
-              <option value="">Qualquer</option>
-              <option value="am">Manhã</option>
-              <option value="pm">Noite</option>
-              <option value="ambos">Manhã e noite</option>
-            </select>
-          </label>
-          <label class="block">
-            <span class="label">Intensidade</span>
-            <select
-              class="field"
-              value={attr.strength}
-              onChange={(e) => setAttr((a) => ({ ...a, strength: (e.target as HTMLSelectElement).value as ProductAttributes['strength'] }))}
-            >
-              <option value="suave">Suave</option>
-              <option value="moderado">Moderado</option>
-              <option value="potente">Potente (retinol/ácido forte)</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="mt-4">
-          <span class="label">Tipos de pele indicados</span>
-          <div class="flex flex-wrap gap-2">
-            {SKIN_TYPES.map((s) => (
-              <button
-                type="button"
-                onClick={() => toggleAttrArray('skin_types', s)}
-                class={`rounded-full border px-3 py-1 text-[13px] ${attr.skin_types.includes(s) ? 'border-ink bg-ink text-bone' : 'border-ink/20'}`}
-              >
-                {SKIN_TYPE_LABELS[s]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div class="mt-4">
-          <span class="label">Preocupações que atende</span>
-          <div class="flex flex-wrap gap-2">
-            {CONCERNS.map((c) => (
-              <button
-                type="button"
-                onClick={() => toggleAttrArray('concerns', c)}
-                class={`rounded-full border px-3 py-1 text-[13px] ${attr.concerns.includes(c) ? 'border-ink bg-ink text-bone' : 'border-ink/20'}`}
-              >
-                {CONCERN_LABELS[c]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <label class="mt-4 flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={attr.pregnancy_safe}
-            onChange={(e) => setAttr((a) => ({ ...a, pregnancy_safe: (e.target as HTMLInputElement).checked }))}
-          />
-          Seguro na gravidez e amamentação
-        </label>
-      </fieldset>
 
       <div class="flex gap-6">
         <label class="flex items-center gap-2 text-sm">

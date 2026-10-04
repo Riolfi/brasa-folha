@@ -1,12 +1,12 @@
-# Brasa & Folha
+# Rolê
 
-E-commerce da **Brasa & Folha** — tabacaria com curadoria (narguilé, sedas, dichavadores
-e acessórios). Catálogo dinâmico, carrinho, checkout com Pix e cartão parcelado, e-mail
+E-commerce da **Rolê** — acessórios streetwear (bonés, bags, meias, óculos, correntes e
+chaveiros). Catálogo dinâmico, carrinho, checkout com Pix e cartão parcelado, e-mail
 transacional, painel administrativo e **Caixa (PDV interno)** para a venda de balcão.
 
 Nasceu como fork do motor da Iarah (loja de skincare, `~/projetos/iarah`) — daí a base
-compartilhada. Aqui o catálogo/tema/conteúdo da tabacaria é o padrão, sem o sistema de
-"perfis de nicho".
+compartilhada. Depois foi tabacaria (Brasa & Folha); hoje o catálogo/tema/conteúdo padrão é
+o da Rolê. O quiz de pele da Iarah foi removido.
 
 Funciona **ponta a ponta desde o primeiro `npm run dev`**: sem chaves de API, o site usa
 um catálogo local, um pagamento simulado e grava os e-mails em disco. Conforme você
@@ -64,8 +64,7 @@ src/
   components/        UI (.astro) + ilhas (.tsx: carrinho, galeria, checkout, admin, CaixaFlow)
   layouts/           BaseLayout, AdminLayout, LegalLayout
   lib/
-    repo/            acesso a dados (catalog.ts, orders.ts, account.ts, quiz.ts, site.ts)
-    quiz/            motor de rotina por regras (desligado por padrão — PUBLIC_QUIZ_ENABLED)
+    repo/            acesso a dados (catalog.ts, orders.ts, account.ts, site.ts)
     cart.ts          stores do carrinho
     mercadopago.ts   pagamento (real ou simulado)
     email.ts         Resend (ou arquivo)

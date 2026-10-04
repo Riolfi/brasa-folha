@@ -2,7 +2,6 @@ import type { APIRoute } from 'astro';
 import {
   saveProduct,
   deleteProduct,
-  normalizeAttributes,
   getSubcategories,
   type ProductInput,
 } from '../../../lib/repo/catalog';
@@ -52,7 +51,6 @@ function parseInput(raw: Record<string, unknown>): { ok: true; value: ProductInp
       is_active: raw.is_active === true || raw.is_active === 'on' || raw.is_active === 'true',
       is_bestseller: raw.is_bestseller === true || raw.is_bestseller === 'on' || raw.is_bestseller === 'true',
       images,
-      attributes: normalizeAttributes(raw.attributes),
     },
   };
 }

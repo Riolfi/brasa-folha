@@ -7,12 +7,11 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import bundledCatalog from '../data/catalog.json';
-import type { Offer, Order, ProductAttributes, SkinQuiz } from './types';
+import type { Offer, Order } from './types';
 
 const DATA_DIR = path.resolve(process.cwd(), '.data');
 const CATALOG_FILE = path.join(DATA_DIR, 'catalog.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
-const QUIZZES_FILE = path.join(DATA_DIR, 'quizzes.json');
 const OFFERS_FILE = path.join(DATA_DIR, 'offers.json');
 const SITE_FILE = path.join(DATA_DIR, 'site.json');
 const EMAILS_DIR = path.join(DATA_DIR, 'emails');
@@ -44,7 +43,6 @@ interface RawProduct {
   rating: number | null;
   reviews_count: number;
   images: string[];
-  attributes?: Partial<ProductAttributes>;
 }
 export interface RawCatalog {
   categories: RawCategory[];
@@ -95,14 +93,6 @@ export async function readOrders(): Promise<Order[]> {
 
 export async function writeOrders(orders: Order[]): Promise<boolean> {
   return writeJson(ORDERS_FILE, orders);
-}
-
-export async function readQuizzes(): Promise<SkinQuiz[]> {
-  return (await readJson<SkinQuiz[]>(QUIZZES_FILE)) ?? [];
-}
-
-export async function writeQuizzes(quizzes: SkinQuiz[]): Promise<boolean> {
-  return writeJson(QUIZZES_FILE, quizzes);
 }
 
 export async function readOffers(): Promise<Offer[] | null> {

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#F6F3EE"/>
-  <path d="M0 470c180-70 320 60 500 30s280-120 460-70 240 30 240 30v170H0Z" fill="#E3ECE9"/>
-  <path d="M0 520c180-60 340 50 520 20s300-100 480-60 200 40 200 40v130H0Z" fill="#6F9C94" opacity="0.85"/>
-  <text x="90" y="270" font-family="Georgia, serif" font-size="110" fill="#211E1B">iarah</text>
-  <text x="94" y="330" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="6" fill="#6F9C94">CUIDADOS COM A PELE INSPIRADOS NA ÁGUA</text>
+  <rect width="1200" height="630" fill="#F6F0E3"/>
+  <path d="M0 0H520C430 50 330 80 230 58 130 36 70 60 0 110Z" fill="#6C2BD9"/>
+  <path d="M0 520c255-47 433 25 647-16s408 17 621-28V630H0Z" fill="#8CDA16"/>
+  <text x="96" y="352" font-family="Arial Black, Helvetica, sans-serif" font-weight="900" font-size="190" fill="#8CDA16" stroke="#231246" stroke-width="10" paint-order="stroke">rolê</text>
+  <text x="102" y="420" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="28" letter-spacing="6" fill="#231246">ACESSÓRIOS STREETWEAR</text>
 </svg>

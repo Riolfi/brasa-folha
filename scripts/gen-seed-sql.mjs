@@ -13,7 +13,7 @@ const catBySlug = new Map(catalog.categories.map((c) => [c.slug, c.id]));
 const newIds = catalog.categories.map((c) => q(c.id)).join(', ');
 
 let out = `-- =============================================================================
--- Brasa & Folha — seed do catálogo (gerado de src/data/catalog.json)
+-- Rolê — seed do catálogo (gerado de src/data/catalog.json)
 -- Rode DEPOIS de 0001..0006. Idempotente. Migra bancos já populados:
 -- renomeia categorias antigas, insere a nova árvore, remapeia produtos e
 -- depois apaga as antigas.
@@ -49,17 +49,16 @@ on conflict (id) do update set
 out += `insert into public.products
   (id, slug, name, category_id, short_description, description, ingredients, how_to_use,
    price_cents, compare_at_price_cents, stock, is_active, is_bestseller, rating, reviews_count,
-   images, attributes)
+   images)
 values
 `;
 out += catalog.products
   .map((p) => {
     const images = `'${JSON.stringify(p.images).replace(/'/g, "''")}'::jsonb`;
-    const attributes = `'${JSON.stringify(p.attributes ?? {}).replace(/'/g, "''")}'::jsonb`;
     return `  (${q(p.id)}, ${q(p.slug)}, ${q(p.name)}, ${q(catBySlug.get(p.category_slug))},
    ${q(p.short_description)}, ${q(p.description)}, ${q(p.ingredients)}, ${q(p.how_to_use)},
    ${n(p.price_cents)}, ${n(p.compare_at_price_cents)}, ${n(p.stock)}, ${b(p.is_active)}, ${b(p.is_bestseller)},
-   ${n(p.rating)}, ${n(p.reviews_count)}, ${images}, ${attributes})`;
+   ${n(p.rating)}, ${n(p.reviews_count)}, ${images})`;
   })
   .join(',\n');
 out += `
@@ -77,8 +76,7 @@ on conflict (slug) do update set
   is_bestseller = excluded.is_bestseller,
   rating = excluded.rating,
   reviews_count = excluded.reviews_count,
-  images = excluded.images,
-  attributes = excluded.attributes;
+  images = excluded.images;
 
 -- 4. remove as categorias antigas (nada mais aponta para elas)
 delete from public.categories where slug like '%\\_\\_legacy';

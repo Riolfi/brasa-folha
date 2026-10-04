@@ -12,78 +12,6 @@ export interface Category {
 /** categoria raiz com suas subcategorias */
 export type CategoryNode = Category & { children: Category[] };
 
-export type SkinType = 'oleosa' | 'seca' | 'mista' | 'normal' | 'sensivel';
-
-export type Concern =
-  | 'acne'
-  | 'oleosidade'
-  | 'poros'
-  | 'linhas-finas'
-  | 'firmeza'
-  | 'manchas'
-  | 'tom-irregular'
-  | 'desidratacao'
-  | 'vermelhidao'
-  | 'opacidade';
-
-export type RoutineStep =
-  | 'limpeza'
-  | 'esfoliacao'
-  | 'tratamento'
-  | 'hidratacao'
-  | 'protecao'
-  | 'complemento';
-
-export type ProductStrength = 'suave' | 'moderado' | 'potente';
-
-export interface ProductAttributes {
-  skin_types: SkinType[];
-  concerns: Concern[];
-  routine_step: RoutineStep | null;
-  time_of_day: 'am' | 'pm' | 'ambos' | null;
-  strength: ProductStrength;
-  pregnancy_safe: boolean;
-}
-
-export const EMPTY_ATTRIBUTES: ProductAttributes = {
-  skin_types: [],
-  concerns: [],
-  routine_step: null,
-  time_of_day: null,
-  strength: 'suave',
-  pregnancy_safe: true,
-};
-
-export const SKIN_TYPE_LABELS: Record<SkinType, string> = {
-  oleosa: 'Oleosa',
-  seca: 'Seca',
-  mista: 'Mista',
-  normal: 'Normal',
-  sensivel: 'Sensível',
-};
-
-export const CONCERN_LABELS: Record<Concern, string> = {
-  acne: 'Acne',
-  oleosidade: 'Oleosidade',
-  poros: 'Poros dilatados',
-  'linhas-finas': 'Linhas finas',
-  firmeza: 'Firmeza',
-  manchas: 'Manchas',
-  'tom-irregular': 'Tom irregular',
-  desidratacao: 'Desidratação',
-  vermelhidao: 'Vermelhidão',
-  opacidade: 'Opacidade',
-};
-
-export const ROUTINE_STEP_LABELS: Record<RoutineStep, string> = {
-  limpeza: 'Limpeza',
-  esfoliacao: 'Esfoliação',
-  tratamento: 'Tratamento',
-  hidratacao: 'Hidratação',
-  protecao: 'Proteção solar',
-  complemento: 'Complemento',
-};
-
 export interface Product {
   id: string;
   slug: string;
@@ -108,7 +36,6 @@ export interface Product {
   rating: number | null;
   reviews_count: number;
   images: string[];
-  attributes: ProductAttributes;
 }
 
 export type OrderStatus =
@@ -215,42 +142,6 @@ export interface CartLine {
   stock: number;
 }
 
-// --- Quiz de pele / rotina personalizada ---
-
-export type QuizAnswers = Record<string, string | string[]>;
-
-export interface RoutineStepResult {
-  step: RoutineStep;
-  stepLabel: string;
-  reason: string;
-  product: {
-    id: string;
-    slug: string;
-    name: string;
-    price_cents: number;
-    image: string;
-    stock: number;
-  };
-}
-
-export interface RoutineResult {
-  summary: string;
-  flags: string[];
-  am: RoutineStepResult[];
-  pm: RoutineStepResult[];
-  weekly: RoutineStepResult | null;
-  totalCents: number;
-}
-
-export interface SkinQuiz {
-  id: string;
-  token: string;
-  user_id: string | null;
-  answers: QuizAnswers;
-  result: RoutineResult;
-  created_at: string;
-}
-
 // --- Conteúdo editável no admin ---
 
 export interface Offer {
@@ -278,7 +169,6 @@ export interface NavLink {
 
 export type SiteSectionKey =
   | 'brand'
-  | 'home_quiz'
   | 'home_bestsellers'
   | 'home_story'
   | 'home_social'
@@ -290,14 +180,6 @@ export type SiteSectionKey =
 export interface BrandContent {
   /** URL do logotipo do cabeçalho. Vazio → usa o nome da marca em texto. */
   logo_url: string;
-}
-
-export interface HomeQuizContent {
-  eyebrow: string;
-  title: string;
-  body: string;
-  cta_label: string;
-  cta_href: string;
 }
 
 export interface HomeBestsellersContent {
@@ -359,7 +241,6 @@ export interface ContatoPageContent {
 
 export interface SiteSectionData {
   brand: BrandContent;
-  home_quiz: HomeQuizContent;
   home_bestsellers: HomeBestsellersContent;
   home_story: HomeStoryContent;
   home_social: HomeSocialContent;

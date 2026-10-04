@@ -26,14 +26,6 @@ function sanitize<K extends SiteSectionKey>(key: K, raw: any): SiteSectionData[K
   switch (key) {
     case 'brand':
       return { logo_url: str(d.logo_url) } as SiteSectionData[K];
-    case 'home_quiz':
-      return {
-        eyebrow: str(d.eyebrow),
-        title: str(d.title),
-        body: str(d.body),
-        cta_label: str(d.cta_label),
-        cta_href: str(d.cta_href) || '/rotina',
-      } as SiteSectionData[K];
     case 'home_bestsellers':
       return {
         eyebrow: str(d.eyebrow),

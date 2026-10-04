@@ -1,23 +1,15 @@
 {
   "brand": {
     "is_active": true,
-    "data": { "logo_url": "" }
-  },
-  "home_quiz": {
-    "is_active": false,
     "data": {
-      "eyebrow": "",
-      "title": "",
-      "body": "",
-      "cta_label": "",
-      "cta_href": "/loja"
+      "logo_url": ""
     }
   },
   "home_bestsellers": {
     "is_active": true,
     "data": {
-      "eyebrow": "Sai mais",
-      "title": "Os queridinhos da casa",
+      "eyebrow": "Mais pedidos",
+      "title": "O que tá saindo",
       "cta_label": "Ver a loja inteira",
       "cta_href": "/loja"
     }
@@ -25,15 +17,24 @@
   "home_story": {
     "is_active": true,
     "data": {
-      "eyebrow": "A casa",
-      "title": "A gente testa antes\nde botar na prateleira",
-      "body": "A Brasa & Folha nasceu do cansaço de comprar acessório que quebra na segunda sessão. Se a rosca do narguilé vaza, se a seda queima torta, se o dichavador trava — não entra no catálogo.",
-      "cta_label": "Conhecer a Brasa & Folha",
+      "eyebrow": "A Rolê",
+      "title": "Acessório bom\nnão precisa ser caro",
+      "body": "A Rolê nasceu de um grupo de amigos cansados de boné que desbota em um mês e bag que rasga a alça. A gente garimpa fornecedor, testa no dia a dia e só coloca na loja o que usaria de verdade.",
+      "cta_label": "Conhecer a Rolê",
       "cta_href": "/sobre",
       "features": [
-        { "title": "Testado de verdade", "body": "Cada item passa por uso real antes de entrar." },
-        { "title": "Catálogo enxuto", "body": "Só o que a gente recompraria. Menos abas, menos dúvida." },
-        { "title": "+18 e discreto", "body": "Confirmação de idade na entrada e embalagem sem identificação externa." }
+        {
+          "title": "Testado na rua",
+          "body": "Cada peça passa um tempo no nosso rolê antes de entrar no catálogo."
+        },
+        {
+          "title": "Drop todo mês",
+          "body": "Coleção pequena e renovada. Acabou, acabou."
+        },
+        {
+          "title": "Troca sem drama",
+          "body": "Não serviu ou não curtiu? 7 dias pra trocar, sem burocracia."
+        }
       ]
     }
   },
@@ -41,28 +42,40 @@
     "is_active": true,
     "data": {
       "eyebrow": "Quem compra volta",
-      "title": "Mais de 6 mil sessões equipadas",
-      "subtitle": "Nota média 4,7 / 5 nas avaliações da loja",
+      "title": "Mais de 8 mil looks fechados",
+      "subtitle": "Nota média 4,8 / 5 nas avaliações da loja",
       "testimonials": [
-        { "quote": "Comprei o kit iniciante sem saber nada de narguilé. Veio tudo explicadinho e a primeira sessão já foi de boa.", "name": "Rafael T.", "detail": "Curitiba" },
-        { "quote": "O dichavador de alumínio é outro nível. Já tinha comprado dois baratos que travaram, esse não.", "name": "Bruna M.", "detail": "São Paulo" },
-        { "quote": "Envio discreto de verdade e chegou rápido. A essência Element sem nicotina virou padrão aqui em casa.", "name": "Diego S.", "detail": "Porto Alegre" }
+        {
+          "quote": "O dad hat lavado é exatamente o desbotado que eu procurava. Já pedi o amarelo também.",
+          "name": "Lucas P.",
+          "detail": "Belo Horizonte"
+        },
+        {
+          "quote": "A transversal de nylon pegou chuva no festival e o celular saiu sequinho. Comprei outra pra minha irmã.",
+          "name": "Marina A.",
+          "detail": "Recife"
+        },
+        {
+          "quote": "Kit de meias listradas virou uniforme. Lavei mil vezes e o punho continua firme.",
+          "name": "Thiago R.",
+          "detail": "São Paulo"
+        }
       ]
     }
   },
   "footer": {
     "is_active": true,
     "data": {
-      "tagline": "Tabacaria com curadoria — narguilé, sedas, dichavadores e acessórios que aguentam o uso.",
-      "returns_line": "Trocas em até 7 dias corridos. Venda proibida para menores de 18 anos.",
-      "legal_line": "Brasa & Folha Comércio de Tabacaria LTDA. CNPJ 00.000.000/0001-00. Todos os direitos reservados.",
-      "payment_line": "Pagamentos pelo Mercado Pago · Pix e cartão em até 6x · Envio discreto"
+      "tagline": "Acessórios streetwear — bonés, bags, meias, óculos e metal pra fechar o look.",
+      "returns_line": "Trocas em até 7 dias corridos. Frete grátis acima de R$ 199.",
+      "legal_line": "Rolê Acessórios LTDA. CNPJ 00.000.000/0001-00. Todos os direitos reservados.",
+      "payment_line": "Pagamentos pelo Mercado Pago · Pix e cartão em até 6x"
     }
   },
   "contact": {
     "is_active": true,
     "data": {
-      "email": "contato@brasaefolha.com.br",
+      "email": "contato@lojarole.com.br",
       "whatsapp_number": "",
       "hours": "Segunda a sábado, das 10h às 20h"
     }
@@ -70,20 +83,29 @@
   "page_sobre": {
     "is_active": true,
     "data": {
-      "hero_eyebrow": "A casa",
-      "hero_title": "Curadoria de tabacaria,\nsem enrolação",
+      "hero_eyebrow": "A Rolê",
+      "hero_title": "Acessório pra rua,\nsem firula",
       "paragraphs": [
-        "A Brasa & Folha nasceu do cansaço de comprar acessório que quebra na segunda sessão. A gente testa tudo antes de colocar na prateleira: se a rosca do narguilé vaza, se a seda queima torta, se o dichavador trava — não entra.",
-        "O catálogo é curto de propósito. Em vez de trezentas essências, as que valem a pena. Em vez de dez dichavadores iguais, o de alumínio que dura e o de acrílico que serve pra começar.",
-        "Atendimento por pessoa de verdade no WhatsApp, envio discreto e troca sem drama. É isso."
+        "A Rolê começou num grupo de amigos que vivia trocando dica de onde comprar boné, bag e meia que prestasse. Virou planilha, virou fornecedor, virou loja.",
+        "O catálogo é curto de propósito. Em vez de cem bonés iguais, os poucos que a gente usaria. Cada drop é pequeno — quando acaba, vem coisa nova.",
+        "Atendimento por gente de verdade no WhatsApp, envio rápido e troca sem drama. É isso."
       ],
       "values": [
-        { "title": "Testado antes de vender", "body": "Cada item passa por uso real. Se falhou pra gente, não vai pra você." },
-        { "title": "Catálogo enxuto", "body": "Só o que a gente recompraria. Menos abas, menos dúvida." },
-        { "title": "+18 e discreto", "body": "Confirmação de idade na entrada e embalagem sem identificação externa." }
+        {
+          "title": "Testado na rua",
+          "body": "Se desbotou, rasgou ou afrouxou com a gente, não vai pra você."
+        },
+        {
+          "title": "Catálogo enxuto",
+          "body": "Só o que a gente recompraria. Menos rolagem, mais certeza."
+        },
+        {
+          "title": "Preço justo",
+          "body": "Sem markup de grife. Qualidade boa a preço de rolê."
+        }
       ],
-      "cta_title": "Primeira vez no narguilé?",
-      "cta_body": "O kit iniciante traz tudo montado e com desconto.",
+      "cta_title": "Não sabe por onde começar?",
+      "cta_body": "O Kit Rolê Completo junta boné, bag e meias com desconto.",
       "cta_label": "Ver os kits",
       "cta_href": "/loja?categoria=kits"
     }
@@ -93,7 +115,7 @@
     "data": {
       "eyebrow": "Atendimento",
       "title": "Fala com a gente",
-      "intro": "Dúvida de montagem, sabor de essência, rastreio ou troca? A gente responde no mesmo dia útil.",
+      "intro": "Dúvida de tamanho, troca, rastreio ou parceria? A gente responde no mesmo dia útil.",
       "show_form": true
     }
   }

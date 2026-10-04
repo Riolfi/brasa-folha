@@ -1,6 +1,6 @@
 ---
 import { getCategoryTree } from '../lib/repo/catalog';
-import { env, hasSupabasePublic } from '../lib/env';
+import { hasSupabasePublic } from '../lib/env';
 import CartButton from './CartButton.tsx';
 import FavoritesLink from './FavoritesLink.tsx';
 import AccountMenu from './AccountMenu.astro';
@@ -8,7 +8,6 @@ import AccountMenu from './AccountMenu.astro';
 const tree = await getCategoryTree();
 const path = Astro.url.pathname;
 const showAccount = hasSupabasePublic;
-const showQuiz = env.quizEnabled;
 const logoUrl = Astro.locals.site.brand.data.logo_url;
 const brandName = Astro.locals.brand.name;
 ---
@@ -61,7 +60,6 @@ const brandName = Astro.locals.brand.name;
           </div>
         </div>
       </div>
-      {showQuiz && <a href="/rotina" class:list={['font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark', path.startsWith('/rotina') && 'text-agua-dark']}>Teste de pele</a>}
       <a href="/sobre" class:list={['font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark', path === '/sobre' && 'text-agua-dark']}>Sobre</a>
       <a href="/contato" class:list={['font-sans text-[13px] uppercase tracking-[0.14em] text-ink transition-colors hover:text-agua-dark', path === '/contato' && 'text-agua-dark']}>Contato</a>
     </nav>
@@ -92,7 +90,6 @@ const brandName = Astro.locals.brand.name;
           ))}
         </>
       ))}
-      {showQuiz && <a href="/rotina" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Teste de pele</a>}
       <a href="/favoritos" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Favoritos</a>
       <a href="/sobre" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Sobre</a>
       <a href="/contato" class="py-2.5 font-sans text-sm uppercase tracking-[0.14em]">Contato</a>

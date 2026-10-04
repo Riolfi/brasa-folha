@@ -59,7 +59,7 @@ const accordionRoots = tree.map((root) => ({
   })),
 }));
 
-const { home_quiz, home_bestsellers, home_story, home_social } = Astro.locals.site;
+const { home_bestsellers, home_story, home_social } = Astro.locals.site;
 const tagline = Astro.locals.site.footer.data.tagline;
 const brandName = Astro.locals.brand.name;
 const storyTitleLines = home_story.data.title.split('\n');
@@ -86,7 +86,7 @@ const orgJsonLd = {
     <div class="tb-marquee__track">
       {[0, 1].map(() => (
         <span>
-          Envio discreto <b>·</b> +18 <b>·</b> Pix e cartão em até 6x <b>·</b> Curadoria testada de verdade <b>·</b> Troca sem drama <b>·</b>
+          Drop novo todo mês <b>·</b> Pix e cartão em até 6x <b>·</b> Frete grátis acima de R$ 199 <b>·</b> Troca sem drama <b>·</b> Feito pra rua <b>·</b>
         </span>
       ))}
     </div>
@@ -129,28 +129,6 @@ const orgJsonLd = {
       <CategoryAccordion client:visible roots={accordionRoots} />
     </div>
   </section>
-
-  <!-- QUIZ CTA -->
-  {home_quiz.is_active && env.quizEnabled && (
-    <section class="py-16 md:py-24">
-      <div class="container-x">
-        <div class="reveal flex flex-col items-start gap-6 rounded-card border border-ink/10 bg-white/50 p-8 md:flex-row md:items-center md:justify-between md:p-12">
-          <div class="max-w-lg">
-            {home_quiz.data.eyebrow && <p class="eyebrow">{home_quiz.data.eyebrow}</p>}
-            <h2 class="mt-3 font-display text-2xl leading-tight sm:text-3xl">
-              {home_quiz.data.title}
-            </h2>
-            {home_quiz.data.body && (
-              <p class="mt-3 font-sans text-[14px] leading-relaxed text-ink-soft">{home_quiz.data.body}</p>
-            )}
-          </div>
-          {home_quiz.data.cta_label && (
-            <a href={home_quiz.data.cta_href || '/rotina'} class="btn-primary shrink-0">{home_quiz.data.cta_label}</a>
-          )}
-        </div>
-      </div>
-    </section>
-  )}
 
   <!-- BEST-SELLERS -->
   {home_bestsellers.is_active && bestsellers.length > 0 && (

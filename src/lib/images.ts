@@ -6,7 +6,7 @@
  * `/uploads/`) são servidas como estão.
  */
 
-const FALLBACK = 'https://images.unsplash.com/photo-1556228720-195a672e8a03';
+const FALLBACK = 'https://images.unsplash.com/photo-1521369909029-2afed882baee';
 
 function isUnsplash(url: string): boolean {
   return /(^|\/\/)images\.unsplash\.com\//.test(url) || /(^|\/\/)plus\.unsplash\.com\//.test(url);

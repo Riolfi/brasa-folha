@@ -7,7 +7,7 @@ interface Props {
   entry: { is_active: boolean; data: unknown };
 }
 
-const TOGGLEABLE: SiteSectionKey[] = ['home_quiz', 'home_bestsellers', 'home_story', 'home_social'];
+const TOGGLEABLE: SiteSectionKey[] = ['home_bestsellers', 'home_story', 'home_social'];
 
 export default function SiteSectionForm({ section, entry }: Props) {
   const [isActive, setIsActive] = useState<boolean>(entry.is_active);
@@ -125,18 +125,6 @@ export default function SiteSectionForm({ section, entry }: Props) {
           <input type="checkbox" checked={isActive} onChange={(e) => setIsActive((e.target as HTMLInputElement).checked)} />
           Mostrar esta seção na home
         </label>
-      )}
-
-      {section === 'home_quiz' && (
-        <>
-          <Text label="Chapéu / eyebrow" value={s('eyebrow')} onInput={(v) => set('eyebrow', v)} />
-          <Text label="Título" value={s('title')} onInput={(v) => set('title', v)} />
-          <Area label="Texto" value={s('body')} onInput={(v) => set('body', v)} />
-          <Row>
-            <Text label="Texto do botão" value={s('cta_label')} onInput={(v) => set('cta_label', v)} />
-            <Text label="Link do botão" value={s('cta_href')} onInput={(v) => set('cta_href', v)} placeholder="/rotina" />
-          </Row>
-        </>
       )}
 
       {section === 'home_bestsellers' && (

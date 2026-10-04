@@ -1,4 +1,4 @@
-# Setup — Brasa & Folha
+# Setup — Rolê
 
 O projeto roda **sem nenhuma configuração** em modo _fallback_ (catálogo do arquivo
 `src/data/catalog.json`, pagamento simulado, e-mail gravado em `.data/emails/`).
@@ -23,18 +23,20 @@ Admin: `http://localhost:4321/admin` — senha em `ADMIN_PASSWORD` (padrão do `
    - `0001_init.sql` — tabelas, RLS, função `confirm_order_payment`
    - `0002_accounts.sql` — contas de cliente (profiles, addresses, `orders.user_id`)
    - `0003_order_status.sql` — status enviado/entregue + rastreio
-   - `0004_quiz.sql` — `products.attributes` + `skin_quizzes` (teste de pele)
+   - `0004_quiz.sql` — legado da Iarah (`products.attributes` + `skin_quizzes`), não usado mais
    - `0005_offers.sql` — carrossel de ofertas da home
    - `0006_categories.sql` — categorias em árvore de 2 níveis (`parent_id`) + imagem;
      triggers que garantem "só 2 níveis" e "produto pertence a uma subcategoria"
-   - `0007_site_content.sql` — conteúdo editável das seções do site (CTA do quiz e
+   - `0007_site_content.sql` — conteúdo editável das seções do site (CTA e
      "mais queridos" na home, rodapé, páginas Sobre e Contato, dados de atendimento)
    - `0008_barcode.sql` — coluna `products.barcode` (EAN/UPC, único) para o leitor
    - `0009_caixa.sql` — coluna `orders.source` + funções `caixa_checkout` /
      `cancel_caixa_sale` para o Caixa (PDV interno, venda de balcão)
    - `0010_offer_mobile_image.sql` — coluna `offers.image_url_mobile`
    Depois rode `npm run seed` (popula catálogo, categorias, ofertas e os textos
-   padrão do site). É idempotente.
+   padrão do site). É idempotente. Num banco com dados de outra loja, use
+   `npm run seed -- --reset`: apaga produtos fora do `catalog.json` (os com pedido
+   ficam inativos), troca as ofertas e sobrescreve os textos do site.
 3. Em **Project Settings → API**, copie para o `.env`:
    - `SUPABASE_URL` → "Project URL"
    - `PUBLIC_SUPABASE_ANON_KEY` → chave `anon` `public`
@@ -70,10 +72,7 @@ aparece quando o Supabase está configurado. Para ativar:
 
 1. Rode também `supabase/migrations/0002_accounts.sql` (tabelas `profiles`, `addresses`,
    coluna `orders.user_id`, RLS e trigger que cria o profile no cadastro),
-   `supabase/migrations/0003_order_status.sql` (status "enviado"/"entregue" + rastreio) e
-   `supabase/migrations/0004_quiz.sql` (coluna `products.attributes` + tabela
-   `skin_quizzes` para o teste de pele). Depois rode `npm run seed` para popular
-   `products.attributes`.
+   `supabase/migrations/0003_order_status.sql` (status "enviado"/"entregue" + rastreio).
 2. **Authentication → Providers → Email**: mantenha habilitado. "Confirm email" ligado
    exige que o Resend/SMTP esteja configurado (senão o link de confirmação não chega —
    em dev ele é gravado em `.data/emails/`). Para testar rápido, desligue "Confirm email".
@@ -128,7 +127,7 @@ Pix de teste é aprovado pelo painel **Atividade → pagamento → "Marcar como 
 
 1. Crie a conta em <https://resend.com> e verifique um domínio (ou use `onboarding@resend.dev` para testes).
 2. Crie uma API key → `RESEND_API_KEY`.
-3. Defina `RESEND_FROM`, ex.: `Brasa & Folha <pedidos@seudominio.com.br>`.
+3. Defina `RESEND_FROM`, ex.: `Rolê <pedidos@seudominio.com.br>`.
 
 Sem a chave, o e-mail de confirmação é gravado em `.data/emails/<numero-do-pedido>.html`.
 

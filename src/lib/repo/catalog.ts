@@ -1,33 +1,7 @@
-import type { Category, CategoryNode, Product, ProductAttributes } from '../types';
+import type { Category, CategoryNode, Product } from '../types';
 import { hasSupabase } from '../env';
 import { supabaseAdmin } from '../supabase';
 import { readCatalog, writeCatalog, type RawCatalog } from '../localstore';
-
-const SKIN_TYPES = ['oleosa', 'seca', 'mista', 'normal', 'sensivel'];
-const CONCERNS = [
-  'acne', 'oleosidade', 'poros', 'linhas-finas', 'firmeza',
-  'manchas', 'tom-irregular', 'desidratacao', 'vermelhidao', 'opacidade',
-];
-const STEPS = ['limpeza', 'esfoliacao', 'tratamento', 'hidratacao', 'protecao', 'complemento'];
-
-/** Normaliza o `attributes` (jsonb do Supabase ou objeto parcial do catalog.json). */
-export function normalizeAttributes(raw: unknown): ProductAttributes {
-  const a = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
-  const arr = (v: unknown, allowed: string[]) =>
-    Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && allowed.includes(x)) : [];
-  const timeOfDay = a.time_of_day;
-  const strength = a.strength;
-  return {
-    skin_types: arr(a.skin_types, SKIN_TYPES) as ProductAttributes['skin_types'],
-    concerns: arr(a.concerns, CONCERNS) as ProductAttributes['concerns'],
-    routine_step: STEPS.includes(a.routine_step as string)
-      ? (a.routine_step as ProductAttributes['routine_step'])
-      : null,
-    time_of_day: timeOfDay === 'am' || timeOfDay === 'pm' || timeOfDay === 'ambos' ? timeOfDay : null,
-    strength: strength === 'moderado' || strength === 'potente' ? strength : 'suave',
-    pregnancy_safe: a.pregnancy_safe !== false,
-  };
-}
 
 export type SortKey = 'destaque' | 'preco-asc' | 'preco-desc' | 'vendidos' | 'novidades';
 
@@ -117,7 +91,6 @@ function rawToProducts(raw: RawCatalog): Product[] {
       category_name: cat?.name ?? '',
       category_path: categoryPath(cats, p.category_slug),
       barcode: p.barcode ?? null,
-      attributes: normalizeAttributes(p.attributes),
     } satisfies Product;
   });
 }
@@ -157,7 +130,6 @@ function rowToProduct(row: any): Product {
     rating: row.rating,
     reviews_count: row.reviews_count ?? 0,
     images: Array.isArray(row.images) ? row.images : [],
-    attributes: normalizeAttributes(row.attributes),
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -426,12 +398,10 @@ export interface ProductInput {
   is_active: boolean;
   is_bestseller: boolean;
   images: string[];
-  attributes?: ProductAttributes;
 }
 
 export async function saveProduct(input: ProductInput): Promise<{ ok: true } | { ok: false; error: string }> {
   const sb = supabaseAdmin();
-  const attributes = normalizeAttributes(input.attributes);
   const barcode = input.barcode?.trim() || null;
 
   if (barcode) {
@@ -442,7 +412,7 @@ export async function saveProduct(input: ProductInput): Promise<{ ok: true } | {
   }
 
   if (hasSupabase && sb) {
-    const payload = { ...input, barcode, attributes, updated_at: new Date().toISOString() };
+    const payload = { ...input, barcode, updated_at: new Date().toISOString() };
     const { error } = input.id
       ? await sb.from('products').update(payload).eq('id', input.id)
       : await sb.from('products').insert(payload);
@@ -472,7 +442,6 @@ export async function saveProduct(input: ProductInput): Promise<{ ok: true } | {
     rating: null,
     reviews_count: 0,
     images: input.images,
-    attributes,
   };
   const idx = catalog.products.findIndex((p) => p.id === record.id);
   if (idx >= 0) catalog.products[idx] = { ...catalog.products[idx], ...record };

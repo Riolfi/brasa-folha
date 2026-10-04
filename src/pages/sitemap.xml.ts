@@ -11,7 +11,6 @@ export const GET: APIRoute = async () => {
   const staticPaths = [
     '/',
     '/loja',
-    ...(env.quizEnabled ? ['/rotina'] : []),
     '/sobre',
     '/contato',
     '/politica-trocas',

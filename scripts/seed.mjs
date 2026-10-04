@@ -6,6 +6,10 @@
  *   3. npm run seed
  *
  * É idempotente: usa upsert por `slug`.
+ *
+ *   npm run seed -- --reset   troca o banco inteiro pelo conteúdo de src/data/:
+ *     apaga produtos que não estão no catalog.json (os que já têm pedido ficam
+ *     inativos), substitui as ofertas e sobrescreve os textos do site.
  */
 import { readFile } from 'node:fs/promises';
 import { createClient } from '@supabase/supabase-js';
@@ -23,6 +27,7 @@ const loadData = async (name) => JSON.parse(await readFile(new URL(name, dataDir
 
 const catalog = await loadData('catalog.json');
 const sb = createClient(url, key, { auth: { persistSession: false } });
+const reset = process.argv.includes('--reset');
 
 console.log(`→ ${catalog.categories.length} categorias, ${catalog.products.length} produtos`);
 
@@ -82,7 +87,6 @@ const { error: prodErr } = await sb.from('products').upsert(
     rating: p.rating,
     reviews_count: p.reviews_count,
     images: p.images,
-    attributes: p.attributes ?? {},
   })),
   { onConflict: 'slug' },
 );
@@ -91,6 +95,25 @@ if (prodErr) {
   process.exit(1);
 }
 console.log('✓ produtos');
+
+// --reset: tira do ar os produtos que não estão no catalog.json. Apaga quando
+// pode; os que têm pedido (FK restrict em order_items) ficam inativos e vão
+// para uma subcategoria nova, liberando as categorias antigas para o passo 3.
+if (reset) {
+  const keep = new Set(catalog.products.map((p) => p.slug));
+  const parking = catalog.categories.find((c) => c.parent_id)?.id;
+  const { data: all } = await sb.from('products').select('id, slug');
+  let removed = 0;
+  let parked = 0;
+  for (const p of (all ?? []).filter((x) => !keep.has(x.slug))) {
+    const { error } = await sb.from('products').delete().eq('id', p.id);
+    if (!error) { removed++; continue; }
+    const { error: e2 } = await sb.from('products').update({ is_active: false, category_id: parking }).eq('id', p.id);
+    if (e2) die(`produto antigo ${p.slug}`, e2);
+    parked++;
+  }
+  console.log(`✓ produtos antigos: ${removed} apagados, ${parked} inativados (têm pedido)`);
+}
 
 // 3. remove as categorias antigas (agora sem produtos apontando para elas)
 const { data: leftovers } = await sb.from('categories').select('id, slug').like('slug', '%__legacy');
@@ -107,7 +130,11 @@ try {
   // chave manda NULL explícito (em vez do default '' da coluna) — normaliza.
   const offers = rawOffers.map((o) => ({ ...o, image_url_mobile: o.image_url_mobile ?? '' }));
   const { count } = await sb.from('offers').select('id', { count: 'exact', head: true });
-  if ((count ?? 0) === 0) {
+  if (reset) {
+    const { error } = await sb.from('offers').delete().not('id', 'in', `(${offers.map((o) => o.id).join(',')})`);
+    if (error) console.warn('… ofertas antigas:', error.message);
+  }
+  if (reset || (count ?? 0) === 0) {
     const { error } = await sb.from('offers').upsert(offers, { onConflict: 'id' });
     if (error) console.warn('… ofertas:', error.message, '(rode a migration 0005_offers.sql)');
     else console.log('✓ ofertas padrão');
@@ -128,9 +155,9 @@ try {
   }));
   const { error } = await sb
     .from('site_content')
-    .upsert(rows, { onConflict: 'section', ignoreDuplicates: true });
+    .upsert(rows, { onConflict: 'section', ignoreDuplicates: !reset });
   if (error) console.warn('… conteúdo do site:', error.message, '(rode a migration 0007_site_content.sql)');
-  else console.log('✓ conteúdo do site (seções padrão)');
+  else console.log(reset ? '✓ conteúdo do site (sobrescrito)' : '✓ conteúdo do site (seções padrão)');
 } catch (e) {
   console.warn('… conteúdo do site pulado:', e.message);
 }
