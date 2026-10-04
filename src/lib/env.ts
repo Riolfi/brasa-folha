@@ -12,7 +12,11 @@ function read(key: string): string {
 }
 
 export const env = {
-  siteUrl: read('PUBLIC_SITE_URL') || 'http://localhost:4321',
+  /** Sem PUBLIC_SITE_URL, usa o domínio de produção que a Vercel expõe. */
+  siteUrl:
+    read('PUBLIC_SITE_URL') ||
+    (read('VERCEL_PROJECT_PRODUCTION_URL') && `https://${read('VERCEL_PROJECT_PRODUCTION_URL')}`) ||
+    'http://localhost:4321',
 
   /** Nome da marca — usado em títulos, e-mails, fatura do cartão, JSON-LD. */
   brandName: read('PUBLIC_BRAND_NAME') || 'Visionário',
