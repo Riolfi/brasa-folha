@@ -1,9 +1,9 @@
 {
-  "name": "role",
+  "name": "visionario",
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "description": "E-commerce da Rolê — acessórios streetwear (bonés, bags, meias e afins)",
+  "description": "E-commerce da Visionário — acessórios streetwear (bonés, bags, meias e afins)",
   "engines": {
     "node": ">=20 <23"
   },

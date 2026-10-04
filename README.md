@@ -1,12 +1,12 @@
-# Rolê
+# Visionário
 
-E-commerce da **Rolê** — acessórios streetwear (bonés, bags, meias, óculos, correntes e
+E-commerce da **Visionário** — acessórios streetwear (bonés, bags, meias, óculos, correntes e
 chaveiros). Catálogo dinâmico, carrinho, checkout com Pix e cartão parcelado, e-mail
 transacional, painel administrativo e **Caixa (PDV interno)** para a venda de balcão.
 
 Nasceu como fork do motor da Iarah (loja de skincare, `~/projetos/iarah`) — daí a base
 compartilhada. Depois foi tabacaria (Brasa & Folha); hoje o catálogo/tema/conteúdo padrão é
-o da Rolê. O quiz de pele da Iarah foi removido.
+o da Visionário. O quiz de pele da Iarah foi removido.
 
 Funciona **ponta a ponta desde o primeiro `npm run dev`**: sem chaves de API, o site usa
 um catálogo local, um pagamento simulado e grava os e-mails em disco. Conforme você

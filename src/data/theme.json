@@ -1,5 +1,5 @@
 {
-  "_comment": "Rolê. Visual street/HQ: papel cru quente, tinta roxa profunda, pop verde-limão ácido, secundário roxo vivo. Display Bricolage Grotesque com contorno+sombra de quadrinho; Bungee nos rótulos; Space Grotesk no texto. Chaves semânticas por posição: bone = fundo, ink = texto, agua = acento (limão), blush = acento secundário (roxo). Trocar os valores aqui re-skina a loja toda.",
+  "_comment": "Visionário. Visual street/HQ: papel cru quente, tinta roxa profunda, pop verde-limão ácido, secundário roxo vivo. Display Bricolage Grotesque com contorno+sombra de quadrinho; Bungee nos rótulos; Space Grotesk no texto. Chaves semânticas por posição: bone = fundo, ink = texto, agua = acento (limão), blush = acento secundário (roxo). Trocar os valores aqui re-skina a loja toda.",
   "colors": {
     "bone": { "DEFAULT": "#F6F0E3", "50": "#FCFAF3", "100": "#F6F0E3", "200": "#ECE2CE", "300": "#E0D2B4" },
     "ink": { "DEFAULT": "#231246", "soft": "#443368", "muted": "#7A6C97" },

@@ -1,4 +1,4 @@
-# Setup — Rolê
+# Setup — Visionário
 
 O projeto roda **sem nenhuma configuração** em modo _fallback_ (catálogo do arquivo
 `src/data/catalog.json`, pagamento simulado, e-mail gravado em `.data/emails/`).
@@ -127,7 +127,7 @@ Pix de teste é aprovado pelo painel **Atividade → pagamento → "Marcar como 
 
 1. Crie a conta em <https://resend.com> e verifique um domínio (ou use `onboarding@resend.dev` para testes).
 2. Crie uma API key → `RESEND_API_KEY`.
-3. Defina `RESEND_FROM`, ex.: `Rolê <pedidos@seudominio.com.br>`.
+3. Defina `RESEND_FROM`, ex.: `Visionário <pedidos@seudominio.com.br>`.
 
 Sem a chave, o e-mail de confirmação é gravado em `.data/emails/<numero-do-pedido>.html`.
 

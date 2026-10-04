@@ -2,7 +2,7 @@
   "brand": {
     "is_active": true,
     "data": {
-      "logo_url": ""
+      "logo_url": "/logo.svg"
     }
   },
   "home_bestsellers": {
@@ -17,10 +17,10 @@
   "home_story": {
     "is_active": true,
     "data": {
-      "eyebrow": "A Rolê",
+      "eyebrow": "Visionário",
       "title": "Acessório bom\nnão precisa ser caro",
-      "body": "A Rolê nasceu de um grupo de amigos cansados de boné que desbota em um mês e bag que rasga a alça. A gente garimpa fornecedor, testa no dia a dia e só coloca na loja o que usaria de verdade.",
-      "cta_label": "Conhecer a Rolê",
+      "body": "A Visionário nasceu de um grupo de amigos cansados de boné que desbota em um mês e bag que rasga a alça. A gente garimpa fornecedor, testa no dia a dia e só coloca na loja o que usaria de verdade.",
+      "cta_label": "Conhecer a Visionário",
       "cta_href": "/sobre",
       "features": [
         {
@@ -68,14 +68,14 @@
     "data": {
       "tagline": "Acessórios streetwear — bonés, bags, meias, óculos e metal pra fechar o look.",
       "returns_line": "Trocas em até 7 dias corridos. Frete grátis acima de R$ 199.",
-      "legal_line": "Rolê Acessórios LTDA. CNPJ 00.000.000/0001-00. Todos os direitos reservados.",
+      "legal_line": "Visionário Acessórios LTDA. CNPJ 00.000.000/0001-00. Todos os direitos reservados.",
       "payment_line": "Pagamentos pelo Mercado Pago · Pix e cartão em até 6x"
     }
   },
   "contact": {
     "is_active": true,
     "data": {
-      "email": "contato@lojarole.com.br",
+      "email": "contato@lojavisionario.com.br",
       "whatsapp_number": "",
       "hours": "Segunda a sábado, das 10h às 20h"
     }
@@ -83,10 +83,10 @@
   "page_sobre": {
     "is_active": true,
     "data": {
-      "hero_eyebrow": "A Rolê",
+      "hero_eyebrow": "Visionário",
       "hero_title": "Acessório pra rua,\nsem firula",
       "paragraphs": [
-        "A Rolê começou num grupo de amigos que vivia trocando dica de onde comprar boné, bag e meia que prestasse. Virou planilha, virou fornecedor, virou loja.",
+        "A Visionário começou num grupo de amigos que vivia trocando dica de onde comprar boné, bag e meia que prestasse. Virou planilha, virou fornecedor, virou loja.",
         "O catálogo é curto de propósito. Em vez de cem bonés iguais, os poucos que a gente usaria. Cada drop é pequeno — quando acaba, vem coisa nova.",
         "Atendimento por gente de verdade no WhatsApp, envio rápido e troca sem drama. É isso."
       ],
