@@ -42,7 +42,10 @@ export async function checkStoreIdentity(): Promise<string | null> {
   const sb = supabaseAdmin();
   if (!sb || identityOk) return null;
   const { data, error } = await sb.from('store_identity').select('store').maybeSingle();
-  if (error) return `store_identity indisponível (${error.message}) — rode a migration 0011`;
+  if (error) {
+    const missing = /store_identity/.test(error.message) ? ' — rode a migration 0011' : '';
+    return `não consegui ler store_identity (${error.message})${missing}`;
+  }
   if (!data) return 'banco sem marca de loja — num banco novo, rode `npm run seed`';
   if (data.store !== STORE_ID) return `o banco pertence à loja "${data.store}"`;
   identityOk = true;
