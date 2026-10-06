@@ -151,7 +151,7 @@ Sem a chave, o e-mail de confirmação é gravado em `.data/emails/<numero-do-pe
 1. Suba o repositório no GitHub e importe em <https://vercel.com/new>.
 2. Framework detectado automaticamente: **Astro**. Nada a configurar no build.
 3. Em **Settings → Environment Variables**, adicione todas as chaves do `.env`
-   (inclusive `PUBLIC_SITE_URL` com o domínio final, ex.: `https://brasaefolha.com.br`).
+   (inclusive `PUBLIC_SITE_URL` com o domínio final, ex.: `https://lojavisionario.com.br`).
 4. Deploy. O adapter `@astrojs/vercel` gera as serverless functions das rotas SSR e das APIs.
 5. Volte ao painel do Mercado Pago e ajuste a URL do webhook para o domínio de produção.
 

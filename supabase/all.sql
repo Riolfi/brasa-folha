@@ -1,5 +1,5 @@
 -- =============================================================================
--- Brasa & Folha — TODAS as migrations num arquivo só. Reexecutável (idempotente).
+-- Visionário — TODAS as migrations num arquivo só. Reexecutável (idempotente).
 -- Cole no SQL Editor do Supabase. Depois: `npm run seed`.
 -- Gerado de supabase/migrations/. Ordem importa.
 -- =============================================================================
