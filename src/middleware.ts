@@ -13,7 +13,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const identityError = await checkStoreIdentity();
   if (identityError) {
     console.error('[store-identity]', identityError);
-    return new Response('Loja temporariamente indisponível.', { status: 503 });
+    // motivo no header (sem segredos) para diagnosticar sem acesso aos logs
+    return new Response('Loja temporariamente indisponível.', {
+      status: 503,
+      headers: { 'x-store-identity': encodeURIComponent(identityError).slice(0, 300) },
+    });
   }
 
   // -------------------------------------------------------------------------
