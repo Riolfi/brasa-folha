@@ -25,7 +25,7 @@ export const env = {
   brandCnpj: read('PUBLIC_BRAND_CNPJ') || '00.000.000/0001-00',
 
   supabaseUrl: read('SUPABASE_URL'),
-  supabaseAnonKey: read('PUBLIC_SUPABASE_ANON_KEY'),
+  supabaseAnonKey: read('SUPABASE_ANON_KEY'),
   supabaseServiceKey: read('SUPABASE_SERVICE_ROLE_KEY'),
 
   mpPublicKey: read('PUBLIC_MP_PUBLIC_KEY'),

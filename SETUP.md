@@ -44,7 +44,7 @@ Admin: `http://localhost:4321/admin` — senha em `ADMIN_PASSWORD` (padrão do `
    ficam inativos), troca as ofertas e sobrescreve os textos do site.
 3. Em **Project Settings → API**, copie para o `.env`:
    - `SUPABASE_URL` → "Project URL"
-   - `PUBLIC_SUPABASE_ANON_KEY` → chave `anon` `public`
+   - `SUPABASE_ANON_KEY` → chave publishable (`sb_publishable_…`) ou `anon` (só servidor; sem prefixo `PUBLIC_`)
    - `SUPABASE_SERVICE_ROLE_KEY` → chave `service_role` (⚠️ secreta, só backend)
 
 Assim que `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` estiverem definidas, o site passa a
