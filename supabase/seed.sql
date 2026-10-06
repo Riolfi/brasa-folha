@@ -5,6 +5,20 @@
 -- depois apaga as antigas.
 -- =============================================================================
 
+-- 0. trava: só roda num banco da Visionário (migration 0011). Banco sem marca
+--    e já com produtos é de outra loja — aborta e nada é alterado.
+do $$
+declare s text;
+begin
+  select store into s from public.store_identity;
+  if s is distinct from 'visionario' then
+    if s is not null or exists (select 1 from public.products) then
+      raise exception 'Este banco não é da Visionário (marca: %). Seed abortado.', coalesce(s, 'nenhuma');
+    end if;
+    insert into public.store_identity (store) values ('visionario');
+  end if;
+end $$;
+
 -- 1. libera os slugs das categorias antigas que não estão na nova árvore
 update public.categories
   set slug = slug || '__legacy'

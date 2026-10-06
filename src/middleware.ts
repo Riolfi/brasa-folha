@@ -4,9 +4,17 @@ import { getServerClient } from './lib/supabase-server';
 import { env, hasSupabasePublic } from './lib/env';
 import { getSiteContent } from './lib/repo/site';
 import { DEFAULT_SITE_CONTENT } from './lib/site-defaults';
+import { checkStoreIdentity } from './lib/supabase';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
+
+  // Banco de outra loja → não lê nem grava nada.
+  const identityError = await checkStoreIdentity();
+  if (identityError) {
+    console.error('[store-identity]', identityError);
+    return new Response('Loja temporariamente indisponível.', { status: 503 });
+  }
 
   // -------------------------------------------------------------------------
   // Sessão do cliente (Supabase Auth) — só quando o Supabase está configurado

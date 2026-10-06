@@ -17,7 +17,10 @@ Admin: `http://localhost:4321/admin` — senha em `ADMIN_PASSWORD` (padrão do `
 
 ## 1. Supabase (banco de dados)
 
-1. Crie um projeto em <https://supabase.com>.
+1. Crie um projeto **novo e exclusivo** em <https://supabase.com>. Nunca reutilize o
+   Supabase de outra loja (Iarah ou qualquer outra): o site e o seed só aceitam um
+   banco marcado como da Visionário (tabela `store_identity`, migration 0011) e
+   recusam qualquer outro — banco de outra loja dá 503 no site e aborta o seed.
 2. Em **SQL Editor**, rode **todas as migrations em ordem** — ou, num projeto novo,
    cole `supabase/all.sql` (as 9 juntas) de uma vez:
    - `0001_init.sql` — tabelas, RLS, função `confirm_order_payment`
@@ -33,6 +36,8 @@ Admin: `http://localhost:4321/admin` — senha em `ADMIN_PASSWORD` (padrão do `
    - `0009_caixa.sql` — coluna `orders.source` + funções `caixa_checkout` /
      `cancel_caixa_sale` para o Caixa (PDV interno, venda de balcão)
    - `0010_offer_mobile_image.sql` — coluna `offers.image_url_mobile`
+   - `0011_store_identity.sql` — marca de identidade do banco (o seed grava
+     `visionario` num banco vazio; banco com produtos e sem marca é recusado)
    Depois rode `npm run seed` (popula catálogo, categorias, ofertas e os textos
    padrão do site). É idempotente. Num banco com dados de outra loja, use
    `npm run seed -- --reset`: apaga produtos fora do `catalog.json` (os com pedido

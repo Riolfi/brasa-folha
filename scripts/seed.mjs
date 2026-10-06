@@ -27,7 +27,25 @@ const loadData = async (name) => JSON.parse(await readFile(new URL(name, dataDir
 
 const catalog = await loadData('catalog.json');
 const sb = createClient(url, key, { auth: { persistSession: false } });
+const die = (label, e) => {
+  console.error(`✗ ${label}:`, e.message);
+  process.exit(1);
+};
 const reset = process.argv.includes('--reset');
+
+// Só grava num banco desta loja (marca em store_identity, migration 0011).
+// Banco sem marca e já com produtos é de outra loja: aborta, sem exceção.
+const STORE = 'visionario';
+const { data: ident, error: identErr } = await sb.from('store_identity').select('store').maybeSingle();
+if (identErr) die('store_identity (rode a migration 0011)', identErr);
+if (ident && ident.store !== STORE) die('banco errado', { message: `pertence à loja "${ident.store}". Nada foi alterado.` });
+if (!ident) {
+  const { count } = await sb.from('products').select('id', { count: 'exact', head: true });
+  if (count) die('banco errado', { message: `sem marca de loja e com ${count} produtos — é de outra loja. Nada foi alterado.` });
+  const { error } = await sb.from('store_identity').insert({ store: STORE });
+  if (error) die('store_identity', error);
+  console.log('✓ banco marcado como da Visionário');
+}
 
 console.log(`→ ${catalog.categories.length} categorias, ${catalog.products.length} produtos`);
 
@@ -42,10 +60,6 @@ const catRow = (c) => ({
 });
 
 const newIds = new Set(catalog.categories.map((c) => c.id));
-const die = (label, e) => {
-  console.error(`✗ ${label}:`, e.message);
-  process.exit(1);
-};
 
 // 1. libera os slugs: renomeia categorias antigas que NÃO estão na nova árvore
 const { data: existing } = await sb.from('categories').select('id, slug');

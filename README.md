@@ -4,8 +4,9 @@ E-commerce da **Visionário** — acessórios streetwear (bonés, bags, meias, �
 chaveiros). Catálogo dinâmico, carrinho, checkout com Pix e cartão parcelado, e-mail
 transacional, painel administrativo e **Caixa (PDV interno)** para a venda de balcão.
 
-Nasceu como fork do motor da Iarah (loja de skincare, `~/projetos/iarah`) — daí a base
-compartilhada. Depois foi tabacaria (Brasa & Folha); hoje o catálogo/tema/conteúdo padrão é
+Nasceu como fork do motor da Iarah (loja de skincare) — só o código. Os dois projetos são
+independentes: repositório, deploy na Vercel e **Supabase próprios**. A Visionário recusa
+qualquer banco que não esteja marcado como dela (ver `store_identity` no SETUP.md). Depois foi tabacaria (Brasa & Folha); hoje o catálogo/tema/conteúdo padrão é
 o da Visionário. O quiz de pele da Iarah foi removido.
 
 Funciona **ponta a ponta desde o primeiro `npm run dev`**: sem chaves de API, o site usa

@@ -1,7 +1,11 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { env, hasSupabase, hasSupabasePublic } from './env';
 
+/** Marca gravada em `store_identity` (migration 0011) no banco desta loja. */
+export const STORE_ID = 'visionario';
+
 let adminClient: SupabaseClient | null = null;
+let identityOk = false;
 let publicClient: SupabaseClient | null = null;
 
 /**
@@ -27,4 +31,20 @@ export function supabasePublic(): SupabaseClient | null {
     });
   }
   return publicClient;
+}
+
+/**
+ * Confere que o Supabase configurado é o desta loja. Devolve o motivo da
+ * recusa, ou null se está tudo certo. Impede que um .env apontando para o
+ * banco de outra loja (já aconteceu com a Iarah) leia ou grave dados dela.
+ */
+export async function checkStoreIdentity(): Promise<string | null> {
+  const sb = supabaseAdmin();
+  if (!sb || identityOk) return null;
+  const { data, error } = await sb.from('store_identity').select('store').maybeSingle();
+  if (error) return `store_identity indisponível (${error.message}) — rode a migration 0011`;
+  if (!data) return 'banco sem marca de loja — num banco novo, rode `npm run seed`';
+  if (data.store !== STORE_ID) return `o banco pertence à loja "${data.store}"`;
+  identityOk = true;
+  return null;
 }
