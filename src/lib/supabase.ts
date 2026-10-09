@@ -44,10 +44,21 @@ export async function checkStoreIdentity(): Promise<string | null> {
   const { data, error } = await sb.from('store_identity').select('store').maybeSingle();
   if (error) {
     const missing = /store_identity/.test(error.message) ? ' — rode a migration 0011' : '';
-    return `não consegui ler store_identity (${error.message})${missing}`;
+    return `não consegui ler store_identity (${error.message})${missing} [${describeConfig()}]`;
   }
   if (!data) return 'banco sem marca de loja — num banco novo, rode `npm run seed`';
   if (data.store !== STORE_ID) return `o banco pertence à loja "${data.store}"`;
   identityOk = true;
   return null;
+}
+
+/** Qual banco e que tipo de chave estão configurados — sem expor valores. */
+function describeConfig(): string {
+  let ref = '?';
+  try {
+    ref = new URL(env.supabaseUrl).hostname.split('.')[0];
+  } catch {}
+  const k = env.supabaseServiceKey;
+  const kind = k.startsWith('sb_secret_') ? 'sb_secret' : k.startsWith('sb_publishable_') ? 'sb_publishable' : k.startsWith('eyJ') ? 'jwt' : 'outro';
+  return `banco: ${ref}, chave: ${kind}/${k.length}${k !== k.trim() ? ' COM ESPAÇO' : ''}`;
 }
