@@ -7,12 +7,12 @@ export const prerender = false;
 
 // já logado? vai direto pra conta
 if (Astro.locals.user) {
-  const dest = safeNextPath(Astro.url.searchParams.get('next'), '/conta');
-  if (dest === '/conta' && (await isAdmin(Astro.locals.user.id))) return Astro.redirect('/admin');
+  const dest = safeNextPath(Astro.url.searchParams.get('next'), '/');
+  if (dest === '/' && (await isAdmin(Astro.locals.user.id))) return Astro.redirect('/admin');
   return Astro.redirect(dest);
 }
 
-const next = safeNextPath(Astro.url.searchParams.get('next'), '/conta');
+const next = safeNextPath(Astro.url.searchParams.get('next'), '/');
 const erro = Astro.url.searchParams.get('erro');
 const nextQs = `next=${encodeURIComponent(next)}`;
 ---

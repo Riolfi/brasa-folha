@@ -1,6 +1,7 @@
 ---
 import type { User } from '@supabase/supabase-js';
-import { safeNextPath } from '../../lib/auth';
+import { safeNextPath, withLoginFlag } from '../../lib/auth';
+import { isAdmin } from '../../lib/repo/admin';
 import { claimGuestOrders } from '../../lib/repo/orders';
 
 export const prerender = false;
@@ -30,9 +31,12 @@ if (user?.email) {
   await claimGuestOrders(user.email, user.id);
 }
 
-const dest = user
-  ? safeNextPath(url.searchParams.get('next'), '/conta')
-  : '/entrar?erro=callback';
+const next = safeNextPath(url.searchParams.get('next'), '/');
+const dest = !user
+  ? '/entrar?erro=callback'
+  : next === '/' && (await isAdmin(user.id))
+    ? '/admin'
+    : withLoginFlag(next);
 
 return Astro.redirect(dest);
 ---

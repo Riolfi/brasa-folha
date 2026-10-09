@@ -6,7 +6,7 @@ export const GET: APIRoute = async ({ locals, url, redirect }) => {
   const sb = locals.supabase;
   if (!sb) return redirect('/');
 
-  const next = safeNextPath(url.searchParams.get('next'), '/conta');
+  const next = safeNextPath(url.searchParams.get('next'), '/');
 
   const { data, error } = await sb.auth.signInWithOAuth({
     provider: 'google',

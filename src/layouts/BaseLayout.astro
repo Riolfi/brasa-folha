@@ -88,5 +88,22 @@ const wpp = `https://wa.me/${Astro.locals.site?.contact.data.whatsapp_number || 
         }
       })();
     </script>
+    <!-- aviso de login feito (?entrou=1, posto pelo /api/auth/login) -->
+    <div id="login-toast" role="status" aria-live="polite" hidden
+      class="fixed bottom-5 left-1/2 z-[60] -translate-x-1/2 whitespace-nowrap rounded-full bg-ink px-5 py-3 font-sans text-sm text-bone shadow-lg">
+      Pronto, você entrou na sua conta.
+    </div>
+    <script>
+      const url = new URL(location.href);
+      if (url.searchParams.has('entrou')) {
+        url.searchParams.delete('entrou');
+        history.replaceState(null, '', url.pathname + url.search + url.hash);
+        const t = document.getElementById('login-toast');
+        if (t) {
+          t.hidden = false;
+          setTimeout(() => (t.hidden = true), 4000);
+        }
+      }
+    </script>
   </body>
 </html>
