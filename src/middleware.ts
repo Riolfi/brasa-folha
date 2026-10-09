@@ -63,6 +63,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const next = encodeURIComponent(pathname + context.url.search);
       return context.redirect(`/entrar?next=${next}`);
     }
+    // a conta do administrador é da loja, não de compras: "Minha conta"
+    // (pedidos, endereços) não se aplica — vai direto pro painel
+    if (
+      pathname === '/conta' || pathname.startsWith('/conta/')
+    ) {
+      if (context.locals.user && (await isAdmin(context.locals.user.id))) return context.redirect('/admin');
+    }
   } else if (accountArea || authArea) {
     // Modo fallback: contas de cliente desligadas
     return context.redirect('/');

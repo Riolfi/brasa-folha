@@ -1,12 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { safeNextPath } from '../lib/auth';
+import { isAdmin } from '../lib/repo/admin';
 
 export const prerender = false;
 
 // já logado? vai direto pra conta
 if (Astro.locals.user) {
-  return Astro.redirect(safeNextPath(Astro.url.searchParams.get('next'), '/conta'));
+  const dest = safeNextPath(Astro.url.searchParams.get('next'), '/conta');
+  if (dest === '/conta' && (await isAdmin(Astro.locals.user.id))) return Astro.redirect('/admin');
+  return Astro.redirect(dest);
 }
 
 const next = safeNextPath(Astro.url.searchParams.get('next'), '/conta');

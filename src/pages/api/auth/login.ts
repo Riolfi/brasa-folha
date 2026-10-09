@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { safeNextPath } from '../../../lib/auth';
 import { claimGuestOrders } from '../../../lib/repo/orders';
+import { isAdmin } from '../../../lib/repo/admin';
 
 export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const sb = locals.supabase;
@@ -19,5 +20,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   if (data.user?.id && data.user.email) {
     await claimGuestOrders(data.user.email, data.user.id);
   }
+  // admin sem destino explícito vai pro painel, não pra "Minha conta"
+  if (next === '/conta' && data.user?.id && (await isAdmin(data.user.id))) return redirect('/admin');
   return redirect(next);
 };
