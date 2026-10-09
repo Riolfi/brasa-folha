@@ -12,6 +12,13 @@ const SITE_URL =
 export default defineConfig({
   site: SITE_URL,
   output: 'server',
+  // O checkOrigin padrão do Astro bloqueia POST de formulário (login,
+  // uploads) quando o header Origin do navegador não bate com a URL da
+  // request — o que acontece na prática atrás do proxy da Vercel ("Cross-site
+  // POST form submissions are forbidden" no /api/auth/login). Mesma correção
+  // da Iarah: a defesa real contra CSRF nas rotas autenticadas é o
+  // SameSite=Lax dos cookies de sessão (cross-site POST não leva o cookie).
+  security: { checkOrigin: false },
   adapter: vercel({
     webAnalytics: { enabled: false },
     imageService: true,
