@@ -1,10 +1,10 @@
 import { defineMiddleware } from 'astro:middleware';
-import { ADMIN_COOKIE, verifySessionToken } from './lib/auth';
 import { getServerClient } from './lib/supabase-server';
 import { env, hasSupabasePublic } from './lib/env';
 import { getSiteContent } from './lib/repo/site';
 import { DEFAULT_SITE_CONTENT } from './lib/site-defaults';
 import { checkStoreIdentity } from './lib/supabase';
+import { isAdmin } from './lib/repo/admin';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
@@ -69,22 +69,25 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // -------------------------------------------------------------------------
-  // Área administrativa (senha única — independente do Supabase Auth)
+  // Área administrativa — mesma conta de cliente (Supabase Auth), precisa
+  // também ter uma linha em admin_users (promovido manualmente no banco).
+  // Sem Supabase configurado não há como logar, então a área fica inacessível.
   // -------------------------------------------------------------------------
   const isAdminArea = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
-  const isLoginRoute = pathname === '/admin/login' || pathname === '/api/admin/login';
-
-  if (isAdminArea && !isLoginRoute) {
-    const token = context.cookies.get(ADMIN_COOKIE)?.value;
-    const authenticated = await verifySessionToken(token);
-    if (!authenticated) {
+  if (isAdminArea) {
+    const authorized = Boolean(context.locals.user) && (await isAdmin(context.locals.user!.id));
+    if (!authorized) {
       if (pathname.startsWith('/api/')) {
-        return new Response(JSON.stringify({ error: 'Não autenticado.' }), {
-          status: 401,
+        const status = context.locals.user ? 403 : 401;
+        const error = context.locals.user ? 'Sem permissão de administrador.' : 'Não autenticado.';
+        return new Response(JSON.stringify({ error }), {
+          status,
           headers: { 'content-type': 'application/json' },
         });
       }
-      return context.redirect('/admin/login');
+      if (context.locals.user) return context.redirect('/');
+      const next = encodeURIComponent(pathname + context.url.search);
+      return context.redirect(`/entrar?next=${next}`);
     }
   }
 

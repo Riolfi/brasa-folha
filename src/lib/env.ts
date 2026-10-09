@@ -37,9 +37,6 @@ export const env = {
     read('RESEND_FROM') ||
     `${read('PUBLIC_BRAND_NAME') || 'Visionário'} <onboarding@resend.dev>`,
 
-  adminPassword: read('ADMIN_PASSWORD'),
-  adminSessionSecret: read('ADMIN_SESSION_SECRET') || 'insecure-dev-secret',
-
   whatsappNumber: read('PUBLIC_WHATSAPP_NUMBER') || '5511999999999',
   shippingFreeThresholdCents: Number(read('PUBLIC_SHIPPING_FREE_THRESHOLD_CENTS') || '19900'),
 };

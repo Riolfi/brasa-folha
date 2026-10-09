@@ -10,8 +10,6 @@ interface ImportMetaEnv {
   readonly MP_WEBHOOK_SECRET: string;
   readonly RESEND_API_KEY: string;
   readonly RESEND_FROM: string;
-  readonly ADMIN_PASSWORD: string;
-  readonly ADMIN_SESSION_SECRET: string;
   readonly PUBLIC_WHATSAPP_NUMBER: string;
   readonly PUBLIC_SHIPPING_FREE_THRESHOLD_CENTS: string;
   readonly PUBLIC_BRAND_NAME: string;

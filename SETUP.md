@@ -11,7 +11,7 @@ npm install
 npm run dev        # http://localhost:4321
 ```
 
-Admin: `http://localhost:4321/admin` — senha em `ADMIN_PASSWORD` (padrão do `.env.example`: `troque-esta-senha`).
+Admin: `http://localhost:4321/admin` — entre em `/entrar` com uma conta que esteja na tabela `admin_users` (ver seção 4).
 
 ---
 
@@ -58,7 +58,7 @@ ler/gravar tudo no Supabase automaticamente (o modo fallback é desativado).
 Paleta, fontes e raio de borda vêm de `src/data/theme.json` — trocar os valores ali
 re-skina a loja inteira (o build lê o arquivo). `agua.{DEFAULT,light,dark,wash}` viram
 variáveis CSS via `src/components/ThemeVars.astro` (incluído em todo `<html>` —
-`BaseLayout`, `AdminLayout` e `admin/login`).
+`BaseLayout` e `AdminLayout`).
 
 ### RLS (resumo)
 
@@ -140,9 +140,14 @@ Sem a chave, o e-mail de confirmação é gravado em `.data/emails/<numero-do-pe
 
 ## 4. Admin
 
-- `ADMIN_PASSWORD` — senha única de acesso ao `/admin`.
-- `ADMIN_SESSION_SECRET` — string aleatória longa para assinar o cookie de sessão
-  (`openssl rand -hex 32`).
+O `/admin` usa a mesma conta de cliente (Supabase Auth). Uma conta é admin
+quando tem uma linha em `admin_users` — rode `supabase/migrations/0012_admin_users.sql`
+uma vez e promova a conta no SQL editor:
+
+```sql
+insert into public.admin_users (user_id)
+select id from auth.users where email = 'admin@visionario.com.br';
+```
 
 ---
 
