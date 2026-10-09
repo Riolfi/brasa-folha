@@ -1,4 +1,5 @@
 ---
+import { orderLabel } from '../../lib/format';
 import AccountLayout from '../../layouts/AccountLayout.astro';
 import { listOrdersByUser } from '../../lib/repo/orders';
 import { brl } from '../../lib/format';
@@ -21,7 +22,7 @@ const orders = await listOrdersByUser(user.id, 100);
         <li class="py-5">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <a href={`/conta/pedidos/${o.order_number}`} class="font-display text-lg text-ink hover:text-agua-dark">
-              {o.order_number}
+              {orderLabel(o.order_number)}
             </a>
             <span class="rounded-full bg-bone-200 px-2 py-0.5 text-[11px] uppercase">{ORDER_STATUS_LABELS[o.status]}</span>
           </div>

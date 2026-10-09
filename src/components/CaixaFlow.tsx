@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { brl } from '../lib/format';
+import { brl, orderLabel } from '../lib/format';
 import { PAYMENT_METHOD_LABELS, type PaymentMethod } from '../lib/types';
 
 interface Line {
@@ -288,7 +288,7 @@ export default function CaixaFlow() {
         </p>
         <p class="mt-2 font-display text-3xl">{brl(done.total_cents)}</p>
         <p class="mt-1 font-sans text-[13px] text-ink-muted">
-          Pedido {done.order_number} · {PAYMENT_METHOD_LABELS[done.method]}
+          Pedido {orderLabel(done.order_number)} · {PAYMENT_METHOD_LABELS[done.method]}
         </p>
 
         {!cancelled && done.method === 'cash' && done.received_cents != null && (
@@ -339,7 +339,7 @@ export default function CaixaFlow() {
       <div class="mx-auto max-w-lg rounded-card border border-ink/10 bg-white p-8 text-center">
         <p class="font-sans text-[13px] uppercase tracking-[0.14em] text-ink-muted">Aguardando o Pix</p>
         <p class="mt-2 font-display text-3xl">{brl(pixWait.total_cents)}</p>
-        <p class="mt-1 font-sans text-[13px] text-ink-muted">Pedido {pixWait.order_number}</p>
+        <p class="mt-1 font-sans text-[13px] text-ink-muted">Pedido {orderLabel(pixWait.order_number)}</p>
 
         {pixWait.pix?.qrCodeBase64 && (
           <img

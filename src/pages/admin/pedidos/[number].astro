@@ -1,4 +1,5 @@
 ---
+import { orderLabel } from '../../../lib/format';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { getOrderByNumber } from '../../../lib/repo/orders';
 import { brl, formatCpf, formatPhone } from '../../../lib/format';
@@ -16,7 +17,7 @@ const updateError = Astro.url.searchParams.get('erro') === 'update';
 const statuses = Object.entries({ pending: 'Aguardando pagamento', paid: 'Pago — em separação', failed: 'Pagamento não concluído', cancelled: 'Cancelado', shipped: 'Enviado', delivered: 'Entregue' }) as [OrderStatus, string][];
 ---
 
-<AdminLayout title={`Pedido ${order.order_number}`}>
+<AdminLayout title={`Pedido ${orderLabel(order.order_number)}`}>
   <a href="/admin/pedidos" class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted hover:text-ink">← Pedidos</a>
 
   {saved && (

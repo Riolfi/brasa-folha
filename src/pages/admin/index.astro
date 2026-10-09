@@ -1,4 +1,5 @@
 ---
+import { orderLabel } from '../../lib/format';
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { getProducts } from '../../lib/repo/catalog';
 import { listOrders } from '../../lib/repo/orders';
@@ -53,7 +54,7 @@ const recent = orders.slice(0, 8);
           <tbody>
             {recent.map((o) => (
               <tr class="border-t border-ink/10">
-                <td class="py-2"><a href={`/admin/pedidos/${o.order_number}`} class="text-agua-dark">{o.order_number}</a></td>
+                <td class="py-2"><a href={`/admin/pedidos/${o.order_number}`} class="text-agua-dark">{orderLabel(o.order_number)}</a></td>
                 <td class="py-2 text-ink-soft">{o.customer_name}</td>
                 <td class="py-2"><span class="rounded-full bg-bone-200 px-2 py-0.5 text-[11px] uppercase">{orderStatusLabel(o.status, o.source)}</span></td>
                 <td class="py-2 text-right">{brl(o.total_cents)}</td>

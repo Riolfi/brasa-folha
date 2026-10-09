@@ -75,14 +75,18 @@ export function isValidCep(value: string): boolean {
   return onlyDigits(value).length === 8;
 }
 
-/** Gera um número de pedido curto e legível: IAR-20260829-8F3A2. */
-export function generateOrderNumber(): string {
-  const now = new Date();
-  const date = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(
-    now.getDate(),
-  ).padStart(2, '0')}`;
-  const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
-  return `IAR-${date}-${rand}`;
+/** Número de pedido: 5 dígitos aleatórios (10000–99999), mostrado como
+ *  "#13453". Aleatório, não sequencial, pra não revelar quantos pedidos a
+ *  loja já teve. A unicidade é garantida em repo/orders (newOrderNumber). */
+export function generateOrderNumber(digits = 5): string {
+  const min = 10 ** (digits - 1);
+  return String(min + Math.floor(Math.random() * 9 * min));
+}
+
+/** Como o número aparece pra pessoas: "#13453". Pedidos antigos
+ *  (IAR-20260829-8F3A2) seguem como estão. */
+export function orderLabel(orderNumber: string): string {
+  return /^\d+$/.test(orderNumber) ? `#${orderNumber}` : orderNumber;
 }
 
 export function isValidEmail(email: string): boolean {

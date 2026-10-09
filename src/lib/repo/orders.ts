@@ -86,7 +86,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
 
   const shipping = Math.max(0, Math.floor(input.shipping_cents || 0));
   const total = subtotal + shipping;
-  const orderNumber = generateOrderNumber();
+  const orderNumber = await newOrderNumber();
   const now = new Date().toISOString();
 
   const base: Order = {
@@ -177,7 +177,7 @@ export async function createCaixaSale(input: CaixaSaleInput): Promise<Order> {
     .filter((i) => i.product_id && i.quantity > 0);
   if (!lines.length) throw new Error('Venda sem itens.');
 
-  const orderNumber = generateOrderNumber();
+  const orderNumber = await newOrderNumber();
   const { error } = await sb.rpc('caixa_checkout', {
     p_order_number: orderNumber,
     p_method: input.method,
@@ -207,7 +207,7 @@ export async function createCaixaPixOrder(input: {
   if (!hasSupabase || !sb) throw new Error('O Caixa exige o Supabase configurado.');
 
   const { items, subtotalCents } = await priceCart(input.items);
-  const orderNumber = generateOrderNumber();
+  const orderNumber = await newOrderNumber();
 
   const { data: orderRow, error } = await sb
     .from('orders')
@@ -248,6 +248,17 @@ export async function cancelCaixaSale(orderNumber: string): Promise<CancelCaixaO
   const { data, error } = await sb.rpc('cancel_caixa_sale', { p_order_number: orderNumber });
   if (error) throw new Error(error.message || 'Falha ao cancelar a venda.');
   return (data as CancelCaixaOutcome) ?? 'not_found';
+}
+
+/** Número de pedido ainda não usado (5 dígitos; se a faixa estiver muito
+ *  cheia, passa pra 6). A coluna é unique no banco — isto só evita colisão
+ *  na prática, a constraint continua sendo a garantia final. */
+async function newOrderNumber(): Promise<string> {
+  for (let i = 0; i < 12; i++) {
+    const n = generateOrderNumber(i < 8 ? 5 : 6);
+    if (!(await getOrderByNumber(n))) return n;
+  }
+  return generateOrderNumber(7);
 }
 
 export async function getOrderByNumber(orderNumber: string): Promise<Order | null> {

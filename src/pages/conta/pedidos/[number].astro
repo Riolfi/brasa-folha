@@ -1,4 +1,5 @@
 ---
+import { orderLabel } from '../../../lib/format';
 import AccountLayout from '../../../layouts/AccountLayout.astro';
 import { getUserOrder } from '../../../lib/repo/orders';
 import { brl } from '../../../lib/format';
@@ -14,7 +15,7 @@ if (!order) return Astro.redirect('/conta/pedidos');
 const a = order.shipping_address;
 ---
 
-<AccountLayout title={`Pedido ${order.order_number}`} active="pedidos">
+<AccountLayout title={`Pedido ${orderLabel(order.order_number)}`} active="pedidos">
   <a href="/conta/pedidos" class="font-sans text-[12px] uppercase tracking-[0.12em] text-ink-muted hover:text-ink">← Meus pedidos</a>
 
   <div class="mt-4 flex flex-wrap items-center gap-3">

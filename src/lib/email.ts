@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { env, hasResend } from './env';
 import { writeEmailFile } from './localstore';
-import { brl } from './format';
+import { brl, orderLabel } from './format';
 import type { Order, OrderStatus } from './types';
 
 type MailResult = { delivered: 'resend' | 'file' | 'none'; ref?: string | null };
@@ -17,7 +17,7 @@ interface StatusCopy {
 }
 
 function statusCopy(order: Order, status: OrderStatus): StatusCopy {
-  const n = order.order_number;
+  const n = orderLabel(order.order_number);
   const first = firstName(order.customer_name);
   switch (status) {
     case 'pending':

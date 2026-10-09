@@ -1,4 +1,5 @@
 ---
+import { orderLabel } from '../../lib/format';
 import AccountLayout from '../../layouts/AccountLayout.astro';
 import { listOrdersByUser } from '../../lib/repo/orders';
 import { getProfile } from '../../lib/repo/account';
@@ -42,7 +43,7 @@ const firstName = (profile.full_name || user.email || '').split(/\s+/)[0];
       {orders.map((o) => (
         <li class="flex items-center justify-between gap-4 py-4">
           <div>
-            <a href={`/conta/pedidos/${o.order_number}`} class="font-sans text-sm text-agua-dark">{o.order_number}</a>
+            <a href={`/conta/pedidos/${o.order_number}`} class="font-sans text-sm text-agua-dark">{orderLabel(o.order_number)}</a>
             <p class="font-sans text-[12px] text-ink-muted">
               {new Date(o.created_at).toLocaleDateString('pt-BR')} · {o.items.length} {o.items.length === 1 ? 'item' : 'itens'}
             </p>

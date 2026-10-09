@@ -11,6 +11,7 @@ import {
   isValidEmail,
   isValidPhone,
   onlyDigits,
+  orderLabel,
 } from '../lib/format';
 import { productImage } from '../lib/images';
 import type { Address } from '../lib/types';
@@ -448,7 +449,7 @@ export default function CheckoutFlow({
         {step === 'payment' && order && (
           <div>
             <h2 class="font-display text-xl">Pagamento</h2>
-            <p class="mt-1 text-[13px] text-ink-muted">Pedido {order.order_number}</p>
+            <p class="mt-1 text-[13px] text-ink-muted">Pedido {orderLabel(order.order_number)}</p>
 
             {MP_PUBLIC_KEY ? (
               <div id="mp-brick-container" class="mt-6" />

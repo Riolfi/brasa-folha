@@ -1,4 +1,5 @@
 ---
+import { orderLabel } from '../../../lib/format';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { listOrders } from '../../../lib/repo/orders';
 import { brl } from '../../../lib/format';
@@ -47,7 +48,7 @@ const tabs = [
         {filtered.map((o) => (
           <tr class="border-t border-ink/10 hover:bg-bone-50">
             <td class="p-3">
-              <a href={`/admin/pedidos/${o.order_number}`} class="text-agua-dark">{o.order_number}</a>
+              <a href={`/admin/pedidos/${o.order_number}`} class="text-agua-dark">{orderLabel(o.order_number)}</a>
               {o.source === 'caixa' && (
                 <span class="ml-2 rounded-full bg-blush-light px-1.5 py-0.5 text-[10px] uppercase tracking-[0.1em] text-ink-soft">Caixa</span>
               )}
